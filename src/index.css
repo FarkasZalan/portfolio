@@ -1,68 +1,196 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+/* Moving Gradient Animation */
+@keyframes move-gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+.animate-move-gradient {
+    background-size: 200% 200%;
+    animation: move-gradient 10s ease infinite;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Glow Effect for Icons */
+@keyframes glow-cyan {
+    0% {
+        filter: drop-shadow(0 0 5px rgba(0, 255, 204, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.8));
+    }
+    100% {
+        filter: drop-shadow(0 0 5px rgba(0, 255, 204, 0.6));
+    }
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+@keyframes glow-purple {
+    0% {
+        filter: drop-shadow(0 0 5px rgba(192, 132, 252, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 15px rgba(192, 132, 252, 0.8));
+    }
+    100% {
+        filter: drop-shadow(0 0 5px rgba(192, 132, 252, 0.6));
+    }
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.hover\:drop-shadow-glow-cyan:hover {
+    animation: glow-cyan 1.5s infinite;
+}
+
+.hover\:drop-shadow-glow-purple:hover {
+    animation: glow-purple 1.5s infinite;
+}
+
+/* Glow Effect for Timeline Dot */
+@keyframes glow-cyan {
+    0% {
+        box-shadow: 0 0 5px rgba(0, 255, 204, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(0, 255, 204, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(0, 255, 204, 0.6);
+    }
+}
+
+.shadow-glow-cyan {
+    animation: glow-cyan 1.5s infinite;
+}
+
+/* Starry Night Background with Random Stars */
+#stars {
+    background: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Add random star positions using multiple box-shadows */
+#stars:after {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: transparent;
+    box-shadow: 
+        817px 434px #fff,
+        1199px 422px #fff,
+        175px 798px #fff,
+        530px 522px #fff,
+        1569px 10px #fff,
+        143px 48px #fff,
+        1578px 92px #fff,
+        165px 173px #fff,
+        1215px 719px #fff,
+        1631px 25px #fff,
+        450px 316px #fff,
+        1440px 219px #fff,
+        1203px 17px #fff,
+        1063px 679px #fff,
+        484px 16px #fff,
+        1221px 603px #fff,
+        1px 562px #fff,
+        583px 411px #fff,
+        364px 536px #fff,
+        993px 339px #fff,
+        755px 464px #fff,
+        1588px 434px #fff,
+        1335px 299px #fff,
+        1431px 83px #fff,
+        286px 480px #fff,
+        89px 183px #fff,
+        500px 212px #fff,
+        1609px 540px #fff,
+        109px 365px #fff,
+        663px 487px #fff,
+        1460px 701px #fff,
+        389px 245px #fff,
+        128px 718px #fff,
+        56px 343px #fff,
+        1075px 321px #fff,
+        1573px 234px #fff,
+        1181px 83px #fff,
+        1101px 405px #fff,
+        133px 259px #fff,
+        914px 18px #fff,
+        343px 574px #fff,
+        108px 252px #fff;
+    opacity: 0.4;
+}
+
+/* Add another layer of smaller stars */
+#stars:before {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: transparent;
+    box-shadow: 
+        571px 30px #fff,
+        1214px 526px #fff,
+        934px 279px #fff,
+        1785px 1055px #fff,
+        527px 721px #fff,
+        1629px 648px #fff,
+        1132px 10px #fff,
+        1538px 117px #fff,
+        100px 312px #fff,
+        468px 78px #fff,
+        421px 325px #fff,
+        989px 632px #fff,
+        525px 111px #fff,
+        1467px 111px #fff,
+        1343px 44px #fff,
+        769px 300px #fff,
+        1250px 683px #fff,
+        76px 227px #fff,
+        1415px 464px #fff,
+        619px 337px #fff,
+        89px 453px #fff,
+        1209px 385px #fff,
+        1085px 523px #fff,
+        403px 173px #fff,
+        1335px 707px #fff,
+        1699px 319px #fff,
+        893px 435px #fff,
+        1675px 281px #fff,
+        140px 442px #fff,
+        512px 598px #fff,
+        200px 538px #fff,
+        910px 513px #fff,
+        827px 612px #fff,
+        521px 367px #fff,
+        1586px 648px #fff,
+        1690px 194px #fff,
+        246px 175px #fff,
+        413px 434px #fff,
+        349px 106px #fff,
+        1246px 317px #fff,
+        1585px 319px #fff,
+        711px 624px #fff,
+        1216px 118px #fff,
+        488px 508px #fff,
+        875px 423px #fff,
+        1089px 722px #fff,
+        1759px 409px #fff,
+        623px 460px #fff,
+        1235px 344px #fff,
+        1118px 59px #fff;
+    opacity: 0.3;
 }
