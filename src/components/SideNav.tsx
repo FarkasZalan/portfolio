@@ -1,106 +1,143 @@
 import { useState } from "react";
-import { AiOutlineHome, AiOutlineMail, AiOutlineMenu, AiOutlineProject } from "react-icons/ai";
+import { AiOutlineHome, AiOutlineMail, AiOutlineMenu, AiOutlineClose, AiOutlineProject } from "react-icons/ai";
 import { BsPerson } from "react-icons/bs";
 import { GrProjects } from "react-icons/gr";
 
 export const SideNav = () => {
     const [nav, setNav] = useState(false);
+
+    // Toggle mobile navigation
     const handleNav = () => {
         setNav(!nav);
     };
 
+    // Smooth scroll to section and hide mobile nav
+    const handleClick = (id: string) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+        }
+        setNav(false); // Hide mobile nav after clicking a link
+    };
+
     return (
         <div>
-            {/* Mobile Menu Button */}
-            <AiOutlineMenu
-                onClick={handleNav}
-                className="absolute top-4 right-4 z-[99] md:hidden cursor-pointer text-cyan-400 hover:text-cyan-300 transition-colors duration-300"
-            />
+            {/* Fixed Hamburger Icon for Mobile */}
+            <div className="fixed top-4 right-4 z-[999] md:hidden">
+                {nav ? (
+                    <AiOutlineClose
+                        onClick={handleNav}
+                        className="cursor-pointer text-cyan-400 hover:text-cyan-300 transition-transform duration-300 transform rotate-180"
+                    />
+                ) : (
+                    <AiOutlineMenu
+                        onClick={handleNav}
+                        className="cursor-pointer text-cyan-400 hover:text-cyan-300 transition-transform duration-300"
+                    />
+                )}
+            </div>
 
             {/* Mobile Navigation Menu */}
-            {nav && (
-                <div className="fixed w-full h-screen bg-black/90 flex flex-col justify-center items-center z-20 md:hidden">
-                    <a
-                        href="#main"
-                        className="w-[75%] flex justify-center items-center rounded-full shadow-lg bg-black/50 shadow-cyan-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20 hover:shadow-cyan-400/50"
-                    >
-                        <AiOutlineHome size={20} className="text-cyan-400" />
-                        <span className="pl-4 text-cyan-400">Home</span>
-                    </a>
+            <div
+                className={`fixed w-full h-screen bg-black/50 backdrop-blur-md flex flex-col justify-center items-center z-20 md:hidden transition-all duration-300 ease-in-out ${nav ? "opacity-100 visible" : "opacity-0 invisible"
+                    }`}
+            >
+                <a
+                    onClick={() => handleClick("main")}
+                    className="w-[75%] flex justify-center items-center rounded-full bg-cyan-400/10 border border-cyan-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20"
+                >
+                    <AiOutlineHome size={20} className="text-cyan-400" />
+                    <span className="pl-4 text-cyan-400">Home</span>
+                </a>
 
-                    <a
-                        href="#work"
-                        className="w-[75%] flex justify-center items-center rounded-full shadow-lg bg-black/50 shadow-purple-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20 hover:shadow-purple-400/50"
-                    >
-                        <GrProjects size={20} className="text-purple-400" />
-                        <span className="pl-4 text-purple-400">Work</span>
-                    </a>
+                <a
+                    onClick={() => handleClick("work")}
+                    className="w-[75%] flex justify-center items-center rounded-full bg-purple-400/10 border border-purple-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20"
+                >
+                    <GrProjects size={20} className="text-purple-400" />
+                    <span className="pl-4 text-purple-400">Work</span>
+                </a>
 
-                    <a
-                        href="#projects"
-                        className="w-[75%] flex justify-center items-center rounded-full shadow-lg bg-black/50 shadow-pink-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-pink-400/20 hover:shadow-pink-400/50"
-                    >
-                        <AiOutlineProject size={20} className="text-pink-400" />
-                        <span className="pl-4 text-pink-400">Projects</span>
-                    </a>
+                <a
+                    onClick={() => handleClick("projects")}
+                    className="w-[75%] flex justify-center items-center rounded-full bg-pink-400/10 border border-pink-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-pink-400/20"
+                >
+                    <AiOutlineProject size={20} className="text-pink-400" />
+                    <span className="pl-4 text-pink-400">Projects</span>
+                </a>
 
-                    <a
-                        href="#resume"
-                        className="w-[75%] flex justify-center items-center rounded-full shadow-lg bg-black/50 shadow-cyan-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20 hover:shadow-cyan-400/50"
-                    >
-                        <BsPerson size={20} className="text-cyan-400" />
-                        <span className="pl-4 text-cyan-400">Resume</span>
-                    </a>
+                <a
+                    onClick={() => handleClick("resume")}
+                    className="w-[75%] flex justify-center items-center rounded-full bg-cyan-400/10 border border-cyan-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20"
+                >
+                    <BsPerson size={20} className="text-cyan-400" />
+                    <span className="pl-4 text-cyan-400">Resume</span>
+                </a>
 
-                    <a
-                        href="#contact"
-                        className="w-[75%] flex justify-center items-center rounded-full shadow-lg bg-black/50 shadow-purple-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20 hover:shadow-purple-400/50"
-                    >
-                        <AiOutlineMail size={20} className="text-purple-400" />
-                        <span className="pl-4 text-purple-400">Contact</span>
-                    </a>
-                </div>
-            )}
+                <a
+                    onClick={() => handleClick("contact")}
+                    className="w-[75%] flex justify-center items-center rounded-full bg-purple-400/10 border border-purple-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20"
+                >
+                    <AiOutlineMail size={20} className="text-purple-400" />
+                    <span className="pl-4 text-purple-400">Contact</span>
+                </a>
+            </div>
 
             {/* Desktop Navigation Menu */}
             <div className="md:block hidden fixed top-[25%] z-10">
                 <div className="flex flex-col">
                     <a
-                        href="#main"
-                        className="rounded-full shadow-lg bg-black/50 shadow-cyan-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20 hover:shadow-cyan-400/50"
+                        onClick={() => handleClick("main")}
+                        className="relative flex items-center rounded-full bg-cyan-400/10 border border-cyan-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20 backdrop-blur-sm group overflow-hidden w-13.5 hover:w-32 transition-all duration-300"
                     >
-                        <AiOutlineHome size={20} className="text-cyan-400" />
+                        <AiOutlineHome size={20} className="text-cyan-400 min-w-[20px]" />
+                        <span className="text-cyan-400 ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            Home
+                        </span>
                     </a>
 
                     <a
-                        href="#work"
-                        className="rounded-full shadow-lg bg-black/50 shadow-purple-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20 hover:shadow-purple-400/50"
+                        onClick={() => handleClick("work")}
+                        className="relative flex items-center rounded-full bg-purple-400/10 border border-purple-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20 backdrop-blur-sm group overflow-hidden w-13.5 hover:w-32 transition-all duration-300"
                     >
-                        <GrProjects size={20} className="text-purple-400" />
+                        <GrProjects size={20} className="text-purple-400 min-w-[20px]" />
+                        <span className="text-purple-400 ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            Work
+                        </span>
                     </a>
 
                     <a
-                        href="#projects"
-                        className="rounded-full shadow-lg bg-black/50 shadow-pink-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-pink-400/20 hover:shadow-pink-400/50"
+                        onClick={() => handleClick("projects")}
+                        className="relative flex items-center rounded-full bg-pink-400/10 border border-pink-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-pink-400/20 backdrop-blur-sm group overflow-hidden w-13.5 hover:w-32 transition-all duration-300"
                     >
-                        <AiOutlineProject size={20} className="text-pink-400" />
+                        <AiOutlineProject size={20} className="text-pink-400 min-w-[20px]" />
+                        <span className="text-pink-400 ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            Projects
+                        </span>
                     </a>
 
                     <a
-                        href="#resume"
-                        className="rounded-full shadow-lg bg-black/50 shadow-cyan-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20 hover:shadow-cyan-400/50"
+                        onClick={() => handleClick("resume")}
+                        className="relative flex items-center rounded-full bg-cyan-400/10 border border-cyan-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20 backdrop-blur-sm group overflow-hidden w-13.5 hover:w-32 transition-all duration-300"
                     >
-                        <BsPerson size={20} className="text-cyan-400" />
+                        <BsPerson size={20} className="text-cyan-400 min-w-[20px]" />
+                        <span className="text-cyan-400 ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            Resume
+                        </span>
                     </a>
 
                     <a
-                        href="#contact"
-                        className="rounded-full shadow-lg bg-black/50 shadow-purple-500/50 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20 hover:shadow-purple-400/50"
+                        onClick={() => handleClick("contact")}
+                        className="relative flex items-center rounded-full bg-purple-400/10 border border-purple-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20 backdrop-blur-sm group overflow-hidden w-13.5 hover:w-32 transition-all duration-300"
                     >
-                        <AiOutlineMail size={20} className="text-purple-400" />
+                        <AiOutlineMail size={20} className="text-purple-400 min-w-[20px]" />
+                        <span className="text-purple-400 ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            Contact
+                        </span>
                     </a>
                 </div>
             </div>
+
         </div>
     );
 };

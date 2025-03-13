@@ -194,3 +194,25 @@
         1118px 59px #fff;
     opacity: 0.3;
 }
+
+/* Sidebar on mobiles */
+/* Custom blur effect */
+.backdrop-blur-custom {
+    backdrop-filter: blur(10px); /* Adjust blur intensity */
+    background-color: rgba(0, 0, 0, 0.5); /* Adjust transparency */
+}
+
+.hamburger-to-x {
+    transition: transform 0.3s ease-in-out;
+}
+.hamburger-to-x.open {
+    transform: rotate(90deg);
+}
+
+/* sidebar on desktop */
+.desktop-nav-item {
+    transition: opacity 0.3s ease-in-out;
+}
+.desktop-nav-item:hover .nav-text {
+    opacity: 1;
+}

@@ -13,20 +13,21 @@ const Main = () => {
                     </h1>
 
                     {/* Animated Typing Text */}
-                    <h2 className='flex sm:text-3xl text-2xl pt-4 font-mono text-gray-300'>
-                        I'm a
+                    <h2 className='flex sm:text-3xl text-2xl pt-3 font-mono text-gray-300'>
                         <TypeAnimation
                             sequence={[
                                 'Developer',
                                 2000,
-                                'Problem Solver',
-                                2000,
                                 'Tech Enthusiast',
+                                2000,
+                                'Programmer',
+                                2000,
+                                'Problem Solver',
                                 2000,
                             ]}
                             wrapper="div"
                             speed={50}
-                            style={{ fontSize: '1em', paddingLeft: '10px', color: '#00ffcc' }}
+                            style={{ fontSize: '1em', color: '#00ffcc' }}
                             repeat={Infinity}
                         />
                     </h2>
