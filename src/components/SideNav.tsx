@@ -26,11 +26,13 @@ export const SideNav = () => {
             <div className="fixed top-4 right-4 z-[999] md:hidden">
                 {nav ? (
                     <AiOutlineClose
+                        size={25}
                         onClick={handleNav}
                         className="cursor-pointer text-cyan-400 hover:text-cyan-300 transition-transform duration-300 transform rotate-180"
                     />
                 ) : (
                     <AiOutlineMenu
+                        size={25}
                         onClick={handleNav}
                         className="cursor-pointer text-cyan-400 hover:text-cyan-300 transition-transform duration-300"
                     />
@@ -44,42 +46,42 @@ export const SideNav = () => {
             >
                 <a
                     onClick={() => handleClick("main")}
-                    className="w-[75%] flex justify-center items-center rounded-full bg-cyan-400/10 border border-cyan-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20"
+                    className="w-[75%] flex justify-center items-center rounded-full bg-cyan-600/40 border border-cyan-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20"
                 >
-                    <AiOutlineHome size={20} className="text-cyan-400" />
-                    <span className="pl-4 text-cyan-400">Home</span>
+                    <AiOutlineHome size={20} className="text-cyan-200" />
+                    <span className="pl-4 text-cyan-100">Home</span>
                 </a>
 
                 <a
                     onClick={() => handleClick("work")}
-                    className="w-[75%] flex justify-center items-center rounded-full bg-purple-400/10 border border-purple-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20"
+                    className="w-[75%] flex justify-center items-center rounded-full bg-purple-600/40 border border-purple-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20"
                 >
-                    <GrProjects size={20} className="text-purple-400" />
-                    <span className="pl-4 text-purple-400">Work</span>
+                    <GrProjects size={20} className="text-purple-200" />
+                    <span className="pl-4 text-purple-200">Work</span>
                 </a>
 
                 <a
                     onClick={() => handleClick("projects")}
-                    className="w-[75%] flex justify-center items-center rounded-full bg-pink-400/10 border border-pink-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-pink-400/20"
+                    className="w-[75%] flex justify-center items-center rounded-full bg-pink-600/40 border border-pink-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-pink-400/20"
                 >
-                    <AiOutlineProject size={20} className="text-pink-400" />
-                    <span className="pl-4 text-pink-400">Projects</span>
+                    <AiOutlineProject size={20} className="text-pink-200" />
+                    <span className="pl-4 text-pink-200">Projects</span>
                 </a>
 
                 <a
                     onClick={() => handleClick("resume")}
-                    className="w-[75%] flex justify-center items-center rounded-full bg-cyan-400/10 border border-cyan-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20"
+                    className="w-[75%] flex justify-center items-center rounded-full bg-cyan-600/40 border border-cyan-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-cyan-400/20"
                 >
-                    <BsPerson size={20} className="text-cyan-400" />
-                    <span className="pl-4 text-cyan-400">Resume</span>
+                    <BsPerson size={20} className="text-cyan-200" />
+                    <span className="pl-4 text-cyan-200">Resume</span>
                 </a>
 
                 <a
                     onClick={() => handleClick("contact")}
-                    className="w-[75%] flex justify-center items-center rounded-full bg-purple-400/10 border border-purple-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20"
+                    className="w-[75%] flex justify-center items-center rounded-full bg-purple-600/40 border border-purple-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20"
                 >
-                    <AiOutlineMail size={20} className="text-purple-400" />
-                    <span className="pl-4 text-purple-400">Contact</span>
+                    <AiOutlineMail size={20} className="text-purple-200" />
+                    <span className="pl-4 text-purple-200">Contact</span>
                 </a>
             </div>
 
