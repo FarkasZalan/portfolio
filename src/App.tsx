@@ -1,4 +1,5 @@
 import Contact from './components/Contact';
+import CyberFishGame from './components/CyberFishGame';
 import Main from './components/Main';
 import Projects from './components/Projects';
 import Resume from './components/Resume';
@@ -21,6 +22,7 @@ function App() {
         <Projects />
         <Resume />
         <Contact />
+        <CyberFishGame />
       </div>
     </div>
   );
