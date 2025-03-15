@@ -421,7 +421,16 @@ const CyberFishGame: React.FC = () => {
         const capWidth = width + 20;
 
         // Draw pipe body
-        ctx.fillStyle = '#00ffcc';
+
+        // Create a neon gradient for the pipe body
+        const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
+        gradient.addColorStop(0, '#00ffff'); // Electric cyan
+        gradient.addColorStop(0.3, '#ff00ff'); // Hot pink
+        gradient.addColorStop(0.6, '#9400d3'); // Vivid purple
+        gradient.addColorStop(1, '#00ff7f'); // Acid green
+
+        // Draw pipe body with gradient
+        ctx.fillStyle = gradient;
         ctx.fillRect(x, y, width, height);
 
         // Draw pipe cap
@@ -610,7 +619,7 @@ const CyberFishGame: React.FC = () => {
     // Render high scores
     const renderHighScores = () => {
         return (
-            <div className="bg-black bg-opacity-70 rounded-lg p-3 max-h-48 overflow-y-auto border border-indigo-800">
+            <div className="bg-gradient-to-b from-black to-purple-950 bg-opacity-70 rounded-lg p-3 max-h-48 overflow-y-auto border border-indigo-800">
                 <h3 className="text-cyan-400 text-lg font-semibold mb-2">Top Fish</h3>
                 {isLoading ? (
                     <p className="text-indigo-300">Loading scores...</p>
@@ -651,8 +660,13 @@ const CyberFishGame: React.FC = () => {
                 {/* Animated Grid Background */}
                 <div className="absolute inset-0 overflow-hidden"
                     style={{
-                        backgroundImage: 'linear-gradient(rgba(0,0,30,0.7), rgba(0,0,10,0.9)), url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%230073ff\' fill-opacity=\'0.15\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 0h40v40H0V0zm40 40h-40V0h40v40z\'/%3E%3C/g%3E%3C/svg%3E")',
-                        animation: 'gridMove 15s linear infinite'
+                        background: `
+            linear-gradient(160deg, rgba(0, 0, 75, 0.9), rgba(99, 2, 75, 0.95)),
+            url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300ffff' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='50' cy='50' r='5'/%3E%3Ccircle cx='10' cy='10' r='3'/%3E%3Ccircle cx='90' cy='90' r='3'/%3E%3Ccircle cx='30' cy='70' r='2'/%3E%3Ccircle cx='70' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E"),
+            radial-gradient(circle, rgba(4, 255, 255, 0.1) 10%, transparent 20%),
+            radial-gradient(circle, rgba(50, 255, 255, 0.05) 20%, transparent 30%)
+        `,
+                        backgroundSize: 'cover, 40px 40px, 200px 200px, 300px 300px'
                     }}>
                 </div>
 
@@ -669,9 +683,9 @@ const CyberFishGame: React.FC = () => {
                     {/* Header with tech glow */}
                     <div className="text-center mb-8 relative">
                         <div className="absolute -inset-1 bg-cyan-500/20 blur-lg rounded-full"></div>
-                        <h3 className="text-cyan-400 text-3xl font-bold mb-2 relative">FISH REGISTRATION</h3>
+                        <h3 className="text-cyan-400 text-3xl font-bold mb-2 relative">CYBER FISH NICKNAME</h3>
                         <div className="h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent w-full my-3"></div>
-                        <p className="text-indigo-300 relative">Initialize system credentials</p>
+                        <p className="text-indigo-300 relative">Activate your aquatic avatar</p>
                     </div>
 
                     {/* Futuristic Form */}
@@ -680,7 +694,7 @@ const CyberFishGame: React.FC = () => {
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg blur opacity-30"></div>
                             <input
                                 type="text"
-                                placeholder="ENTER CALL SIGN"
+                                placeholder="ENTER YOUR CYBER NAME"
                                 value={playerName}
                                 onChange={(e) => setPlayerName(e.target.value)}
                                 className="relative px-4 py-3 bg-black/70 text-cyan-300 rounded-lg border border-cyan-500/50 focus:outline-none focus:ring focus:ring-purple-500/50 w-full placeholder-cyan-600 font-mono tracking-wide"
@@ -699,7 +713,7 @@ const CyberFishGame: React.FC = () => {
                         >
                             <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-20 transition-opacity"></span>
                             <span className="absolute left-0 w-8 h-full bg-white/20 transform -skew-x-30 -translate-x-10 group-hover:translate-x-32 transition-transform ease-out duration-700"></span>
-                            <span className="relative font-bold tracking-wide">INITIALIZE SWIMMING SYSTEMS</span>
+                            <span className="relative font-bold tracking-wide">LAUNCH INTO THE GALACTIC OCEAN</span>
                         </button>
                     </form>
                 </div>
@@ -734,11 +748,11 @@ const CyberFishGame: React.FC = () => {
 
                     {gameOver && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
-                            <div className="bg-gradient-to-r from-indigo-900/70 to-purple-900/70 p-8 rounded-xl border border-red-500/30 shadow-lg max-w-md text-center">
-                                <p className="text-red-500 text-3xl mb-2 font-bold">FISH DOWN!</p>
+                            <div className="bg-gradient-to-r from-indigo-900/70 to-purple-900/70 p-6 sm:p-8 rounded-xl border border-red-500/30 shadow-lg w-11/12 sm:max-w-md text-center">
+                                <p className="text-red-500 text-2xl sm:text-3xl mb-2 font-bold">FISH TERMINATED!</p>
                                 <div className="h-px bg-gradient-to-r from-transparent via-red-500 to-transparent w-full my-4"></div>
-                                <p className="text-cyan-400 text-2xl mb-2">Score: {score}</p>
-                                <p className="text-purple-400 text-xl mb-6">High Score: {highScore}</p>
+                                <p className="text-cyan-400 text-xl sm:text-2xl mb-2">Score: {score}</p>
+                                <p className="text-purple-400 text-lg sm:text-xl mb-6">High Score: {highScore}</p>
                                 <button
                                     onClick={resetGame}
                                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-full focus:ring focus:ring-purple-500/50 transition transform hover:scale-105 cursor-pointer"
@@ -749,7 +763,8 @@ const CyberFishGame: React.FC = () => {
                         </div>
                     )}
 
-                    <div className="absolute top-4 right-4 bg-black bg-opacity-70 backdrop-blur-sm px-4 py-2 rounded-full text-cyan-400 border border-cyan-500/30">
+                    {/* Score Text */}
+                    <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black bg-opacity-70 backdrop-blur-sm px-4 py-2 rounded-full text-cyan-400 border border-cyan-500/30">
                         Score: {score}
                     </div>
                 </div>
@@ -761,7 +776,7 @@ const CyberFishGame: React.FC = () => {
                 {/* Reposition high score table to a side panel on larger screens */}
                 <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div className="lg:col-span-2">
-                        <div className="bg-black bg-opacity-70 backdrop-blur-sm rounded-lg p-4 h-full border border-indigo-800/50">
+                        <div className="bg-gradient-to-b from-black to-purple-950 bg-opacity-70 backdrop-blur-sm rounded-lg p-4 h-full border border-indigo-800/50">
                             <h3 className="text-cyan-400 text-lg font-semibold mb-2">Navigation Guide</h3>
                             <ul className="text-indigo-300 list-disc pl-5 space-y-2">
                                 <li>Click or press <span className="font-bold">Space</span> or tap to swim forward</li>
