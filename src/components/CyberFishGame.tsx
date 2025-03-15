@@ -708,7 +708,7 @@ const CyberFishGame: React.FC = () => {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-4">
+        <div id="cyber-fish" className="w-full max-w-4xl mx-auto p-4">
             <div className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg p-4 shadow-2xl border border-indigo-700">
                 <h2 className="text-3xl text-center mb-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameName}</h2>
 

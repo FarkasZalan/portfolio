@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AiOutlineHome, AiOutlineMail, AiOutlineMenu, AiOutlineClose, AiOutlineProject } from "react-icons/ai";
 import { BsPerson } from "react-icons/bs";
 import { GrProjects } from "react-icons/gr";
+import { LuGamepad2 } from "react-icons/lu";
 
 export const SideNav = () => {
     const [nav, setNav] = useState(false);
@@ -83,6 +84,14 @@ export const SideNav = () => {
                     <AiOutlineMail size={20} className="text-purple-200" />
                     <span className="pl-4 text-purple-200">Contact</span>
                 </a>
+
+                <a
+                    onClick={() => handleClick("cyber-fish")}
+                    className="w-[75%] flex justify-center items-center rounded-full bg-pink-600/40 border border-pink-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-purple-400/20"
+                >
+                    <LuGamepad2 size={20} className="text-purple-200" />
+                    <span className="pl-4 text-pink-200">Cyber Fish</span>
+                </a>
             </div>
 
             {/* Desktop Navigation Menu */}
@@ -135,6 +144,16 @@ export const SideNav = () => {
                         <AiOutlineMail size={20} className="text-purple-400 min-w-[20px]" />
                         <span className="text-purple-400 ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             Contact
+                        </span>
+                    </a>
+
+                    <a
+                        onClick={() => handleClick("cyber-fish")}
+                        className="relative flex items-center rounded-full bg-pink-400/10 border border-pink-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-pink-400/20 backdrop-blur-sm group overflow-hidden w-13.5 hover:w-32 transition-all duration-300"
+                    >
+                        <LuGamepad2 size={20} className="text-pink-400 min-w-[20px]" />
+                        <span className="text-pink-400 ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            Cyber Fish
                         </span>
                     </a>
                 </div>
