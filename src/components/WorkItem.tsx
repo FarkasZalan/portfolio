@@ -1,7 +1,7 @@
 const WorkItem = ({ year, title, company, duration, details }: { year: string, title: string, company: string, duration: string, details: string }) => {
     return (
         <div className="group relative pl-8 pr-2">
-            {/* Timeline Line - Solid color instead of gradient */}
+            {/* Timeline Line */}
             <div className="absolute left-0 top-0 h-full w-0.5 bg-cyan-400/80"></div>
 
             {/* Timeline Dot with Pulse Effect */}

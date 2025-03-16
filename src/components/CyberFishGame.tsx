@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+// Define the interfaces for game objects
 interface Fish {
     y: number;
     velocity: number;
@@ -22,30 +23,30 @@ interface Score {
 }
 
 const CyberFishGame: React.FC = () => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [gameStarted, setGameStarted] = useState(false);
-    const [gameOver, setGameOver] = useState(false);
-    const [score, setScore] = useState(0);
-    const [highScore, setHighScore] = useState(0);
-    const [playerName, setPlayerName] = useState('');
-    const [showNameInput, setShowNameInput] = useState(true);
-    const [highScores, setHighScores] = useState<Score[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-    const [gameName] = useState('Cyber Fish');
+    const canvasRef = useRef<HTMLCanvasElement>(null); // Ref to the canvas element
+    const [gameStarted, setGameStarted] = useState(false); // Track if the game has started
+    const [gameOver, setGameOver] = useState(false); // Track if the game is over
+    const [score, setScore] = useState(0); // Current score
+    const [highScore, setHighScore] = useState(0); // High score
+    const [playerName, setPlayerName] = useState(''); // Player's name
+    const [showNameInput, setShowNameInput] = useState(true); // Show name input field
+    const [highScores, setHighScores] = useState<Score[]>([]); // List of high scores
+    const [isLoading, setIsLoading] = useState(false); // Loading state for high scores
+    const [errorMessage, setErrorMessage] = useState(''); // Error message for user feedback
+    const [gameName] = useState('Cyber Fish'); // Game name
     const hasSavedScore = useRef(false); // Flag to track if score has been saved
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]); // Refs for each row in the high score table to scroll to the current player
 
-    // Game constants - adjusted for smoother gameplay
-    const GRAVITY = 0.2;         // Reduced gravity for smoother falling
-    const JUMP_FORCE = -6;       // Reduced jump force for easier control
-    const PIPE_WIDTH = 80;
-    const INITIAL_PIPE_SPEED = 2; // Initial pipe speed
+    // Game constants
+    const GRAVITY = 0.2; // Gravity affecting the Fish
+    const JUMP_FORCE = -6; // Force applied when the fish jumps
+    const PIPE_WIDTH = 80; // Width of the pipes
+    const INITIAL_PIPE_SPEED = 2; // Initial speed of the pipes
     const INITIAL_PIPE_INTERVAL = 180; // Initial interval between pipes
     const INITIAL_PIPE_GAP = 220; // Initial gap between pipes
 
-    // Adjust fish and pipe sizes based on screen width
-    const isSmallDevice = window.innerWidth < 768; // Adjust breakpoint as needed
+    // Check if it's a small device
+    const isSmallDevice = window.innerWidth < 768;
 
     // Game state refs (to avoid re-renders)
     const gameRef = useRef({
@@ -53,7 +54,7 @@ const CyberFishGame: React.FC = () => {
             y: 0,
             velocity: 0,
             width: isSmallDevice ? 30 : 40, // Smaller fish on small devices
-            height: isSmallDevice ? 22 : 30 // Smaller fish on small devices
+            height: isSmallDevice ? 22 : 30
         } as Fish,
         pipes: [] as Pipe[],
         animationFrameId: 0,
@@ -78,7 +79,7 @@ const CyberFishGame: React.FC = () => {
         fetchHighScores();
     }, []);
 
-    // Fetch high scores
+    // Fetch high scores from the API
     const fetchHighScores = async () => {
         try {
             setIsLoading(true);
@@ -96,7 +97,7 @@ const CyberFishGame: React.FC = () => {
         }
     };
 
-    // Save score
+    // Save score to the API
     const saveScore = async (name: string, scoreValue: number) => {
         try {
             const response = await fetch('http://localhost:3000/api/scores', {
@@ -111,7 +112,7 @@ const CyberFishGame: React.FC = () => {
                 throw new Error('Failed to save score');
             }
 
-            fetchHighScores();
+            fetchHighScores(); // Refresh high scores after saving
         } catch (error) {
             setErrorMessage('Failed to save score');
         }
@@ -137,14 +138,12 @@ const CyberFishGame: React.FC = () => {
             }
         };
 
-        // Add the event listener
         window.addEventListener('keydown', handleKeyDown);
 
-        // Clean up the event listener when the component unmounts
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [gameStarted, showNameInput]); // Add dependencies to ensure the listener updates correctly
+    }, [gameStarted, showNameInput]);
 
     // Update game difficulty based on score
     useEffect(() => {
@@ -188,25 +187,24 @@ const CyberFishGame: React.FC = () => {
         };
     }, []);
 
-    // Initialize stars with varying speeds for parallax effect
+    // Initialize stars for the background
     const initializeStars = () => {
         const { canvasWidth, canvasHeight } = gameRef.current;
         const stars = [];
 
-        // Create fewer stars (50 instead of 100) with varying speeds
         for (let i = 0; i < 50; i++) {
             stars.push({
                 x: Math.random() * canvasWidth,
                 y: Math.random() * canvasHeight,
-                size: Math.random() * 2 + 0.5, // Slightly larger stars
-                speed: Math.random() * 0.5 + 0.1, // Varying speeds for parallax
+                size: Math.random() * 2 + 0.5,
+                speed: Math.random() * 0.5 + 0.1,
             });
         }
 
         gameRef.current.stars = stars;
     };
 
-    // Initialize nebula clouds
+    // Initialize nebula clouds for the background
     const initializeNebulas = () => {
         const { canvasWidth, canvasHeight } = gameRef.current;
         const nebulas = [];
@@ -214,10 +212,10 @@ const CyberFishGame: React.FC = () => {
         // Create 3-5 nebula clouds
         const nebulaCount = Math.floor(Math.random() * 3) + 3;
         const nebulaColors = [
-            'rgba(138, 43, 226, 0.2)', // Purple
-            'rgba(75, 0, 130, 0.15)',  // Indigo
-            'rgba(0, 191, 255, 0.15)', // Cyan
-            'rgba(255, 0, 255, 0.1)',  // Magenta
+            'rgba(138, 43, 226, 0.2)',
+            'rgba(75, 0, 130, 0.15)',
+            'rgba(0, 191, 255, 0.15)',
+            'rgba(255, 0, 255, 0.1)',
         ];
 
         for (let i = 0; i < nebulaCount; i++) {
@@ -247,13 +245,13 @@ const CyberFishGame: React.FC = () => {
         setScore(0);
         setScore(0);
         setGameOver(false);
-        setGameStarted(false); // Add this line to reset the gameStarted state
+        setGameStarted(false);
         resetFish();
 
-        // Reset dynamic difficulty variables to their initial values
-        gameRef.current.pipeSpeed = INITIAL_PIPE_SPEED; // Reset pipe speed
-        gameRef.current.pipeInterval = INITIAL_PIPE_INTERVAL; // Reset pipe interval
-        gameRef.current.pipeGap = INITIAL_PIPE_GAP; // Reset pipe gap
+        // Reset dynamic difficulty variables
+        gameRef.current.pipeSpeed = INITIAL_PIPE_SPEED;
+        gameRef.current.pipeInterval = INITIAL_PIPE_INTERVAL;
+        gameRef.current.pipeGap = INITIAL_PIPE_GAP;
 
         // Force the game loop to run and redraw the canvas
         if (!gameRef.current.animationFrameId) {
@@ -276,6 +274,7 @@ const CyberFishGame: React.FC = () => {
         }
     };
 
+    // Check if a player name already exists in the high scores
     const checkNameExists = async (name: string): Promise<boolean> => {
         try {
             const response = await fetch(`http://localhost:3000/api/scores/check-name?name=${encodeURIComponent(name)}`);
@@ -291,6 +290,7 @@ const CyberFishGame: React.FC = () => {
         }
     };
 
+    // Start the game
     const startGame = () => {
         hasSavedScore.current = false;
         if (!gameRef.current.currentPlayerName) {
@@ -302,9 +302,6 @@ const CyberFishGame: React.FC = () => {
             resetGame();
         }
 
-
-
-        // Only start the game if it's not already started
         if (!gameRef.current.playing) {
             gameRef.current.playing = true;
             setGameStarted(true);
@@ -315,7 +312,7 @@ const CyberFishGame: React.FC = () => {
         }
     };
 
-    // Jump with throttling
+    // Make the fish jump
     const jump = () => {
         if (gameRef.current.playing && !gameRef.current.jumping) {
             gameRef.current.fish.velocity = JUMP_FORCE;
@@ -327,7 +324,7 @@ const CyberFishGame: React.FC = () => {
         }
     };
 
-    // Handle game input
+    // Handle game input (click, tap or spacebar)
     const handleInput = () => {
         if (!gameRef.current.currentPlayerName) {
             setErrorMessage('Please enter your name to start the game.');
@@ -366,7 +363,7 @@ const CyberFishGame: React.FC = () => {
             return true;
         }
 
-        // Check pipe collisions with more forgiving hitbox (80% of actual size)
+        // Check pipe collisions with more forgiving hitbox
         const hitboxReduction = 0.2;
         const fishHitboxX = 50 + fish.width * hitboxReduction;
         const fishHitboxY = fish.y + fish.height * hitboxReduction / 2;
@@ -453,16 +450,13 @@ const CyberFishGame: React.FC = () => {
         const capHeight = 20;
         const capWidth = width + 20;
 
-        // Draw pipe body
-
-        // Create a neon gradient for the pipe body
-        const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
-        gradient.addColorStop(0, '#00ffff'); // Electric cyan
-        gradient.addColorStop(0.3, '#ff00ff'); // Hot pink
-        gradient.addColorStop(0.6, '#9400d3'); // Vivid purple
-        gradient.addColorStop(1, '#00ff7f'); // Acid green
-
         // Draw pipe body with gradient
+        const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
+        gradient.addColorStop(0, '#00ffff');
+        gradient.addColorStop(0.3, '#ff00ff');
+        gradient.addColorStop(0.6, '#9400d3');
+        gradient.addColorStop(1, '#00ff7f');
+
         ctx.fillStyle = gradient;
         ctx.fillRect(x, y, width, height);
 
@@ -479,10 +473,10 @@ const CyberFishGame: React.FC = () => {
         ctx.shadowBlur = 10;
         ctx.fillStyle = 'rgba(0, 255, 204, 0.5)';
         ctx.fillRect(x, y, width, height);
-        ctx.shadowBlur = 0; // Reset shadow blur
+        ctx.shadowBlur = 0;
     };
 
-    // Draw background with parallax stars and nebulas
+    // Draw the background with stars and nebulas
     const drawBackground = (ctx: CanvasRenderingContext2D) => {
         const { canvasWidth, canvasHeight, stars, nebulas, playing } = gameRef.current;
 
@@ -494,7 +488,7 @@ const CyberFishGame: React.FC = () => {
         ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        // Draw nebulas first (they're behind stars)
+        // Draw nebulas
         nebulas.forEach(nebula => {
             ctx.save();
             const nebulaGradient = ctx.createRadialGradient(
@@ -520,7 +514,7 @@ const CyberFishGame: React.FC = () => {
             ctx.fill();
             ctx.restore();
 
-            // Move nebulas very slowly if playing
+            // Move nebulas slowly if playing
             if (playing) {
                 nebula.x -= 0.1;
 
@@ -532,7 +526,7 @@ const CyberFishGame: React.FC = () => {
             }
         });
 
-        // Draw and update stars with parallax effect
+        // Draw stars
         ctx.fillStyle = '#ffffff';
         stars.forEach(star => {
             ctx.beginPath();
@@ -574,7 +568,7 @@ const CyberFishGame: React.FC = () => {
         // Clear canvas
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-        // Draw the enhanced background with stars and nebulas
+        // Draw the background with stars and nebulas
         drawBackground(ctx);
 
         // Update fish position for hovering effect
@@ -591,7 +585,6 @@ const CyberFishGame: React.FC = () => {
 
         // Draw pipes
         if (gameRef.current.playing) {
-            // Pipes movement and drawing logic
             gameRef.current.frameCount++;
             if (gameRef.current.frameCount % pipeInterval === 0) {
                 gameRef.current.pipes.push(createPipe());
@@ -632,9 +625,8 @@ const CyberFishGame: React.FC = () => {
 
         // Check collisions
         if (gameRef.current.playing && checkCollisions()) {
-            // Get the current score from the state updater function
             setScore((currentScore) => {
-                // Save score to database using the current score value
+                // Save score to database if not already saved
                 if (gameRef.current.currentPlayerName && currentScore > 0 && !hasSavedScore.current) {
                     saveScore(gameRef.current.currentPlayerName, currentScore);
                     hasSavedScore.current = true;
@@ -655,16 +647,20 @@ const CyberFishGame: React.FC = () => {
         gameRef.current.animationFrameId = requestAnimationFrame(gameLoop);
     };
 
-    // Render high scores
+    // Render high scores table
     const renderHighScores = () => {
         return (
             <div className="bg-gradient-to-b from-gray-900 to-gray-800 bg-opacity-90 rounded-lg p-3 max-h-48 overflow-y-auto border border-gray-700 high-scores-table">
+                {/* Table Header */}
                 <h3 className="text-cyan-400 text-lg font-semibold mb-2">Top Fish</h3>
                 {isLoading ? (
+                    // Loading state
                     <p className="text-indigo-300">Loading scores...</p>
                 ) : errorMessage ? (
+                    // Error state
                     <p className="text-red-400">{errorMessage}</p>
                 ) : highScores.length > 0 ? (
+                    // High scores table
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="text-left text-cyan-300">
@@ -678,9 +674,9 @@ const CyberFishGame: React.FC = () => {
                             {highScores.map((entry, index) => {
                                 const isCurrentPlayer = entry.name === gameRef.current.currentPlayerName;
                                 const rowClass = `
-                                    ${isCurrentPlayer ? 'current-player' : ''}
-                                    high-score-row
-                                `;
+                                ${isCurrentPlayer ? 'current-player' : ''}
+                                high-score-row
+                            `;
 
                                 // Medal icons for top 3 players
                                 const rankDisplay =
@@ -697,7 +693,7 @@ const CyberFishGame: React.FC = () => {
                                 return (
                                     <tr
                                         key={index}
-                                        ref={(el) => (rowRefs.current[index] = el)} // Assign ref to each row
+                                        ref={(el) => (rowRefs.current[index] = el)} // Assign ref to each row for scrolling
                                         className={`${rowClass} text-indigo-200 border-t border-indigo-800`}
                                     >
                                         <td className="py-1">{rankDisplay}</td>
@@ -710,17 +706,16 @@ const CyberFishGame: React.FC = () => {
                                 );
                             })}
                         </tbody>
-
-
                     </table>
                 ) : (
+                    // No scores state
                     <p className="text-indigo-300">No scores yet. Be the first!</p>
                 )}
             </div>
         );
     };
 
-    // Futuristic UI elements for the name input screen
+    // Render the futuristic name input screen
     const renderFuturisticNameInput = () => {
         return (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-60">
@@ -728,11 +723,11 @@ const CyberFishGame: React.FC = () => {
                 <div className="absolute inset-0 overflow-hidden"
                     style={{
                         background: `
-            linear-gradient(160deg, rgba(0, 0, 75, 0.9), rgba(99, 2, 75, 0.95)),
-            url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300ffff' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='50' cy='50' r='5'/%3E%3Ccircle cx='10' cy='10' r='3'/%3E%3Ccircle cx='90' cy='90' r='3'/%3E%3Ccircle cx='30' cy='70' r='2'/%3E%3Ccircle cx='70' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E"),
-            radial-gradient(circle, rgba(4, 255, 255, 0.1) 10%, transparent 20%),
-            radial-gradient(circle, rgba(50, 255, 255, 0.05) 20%, transparent 30%)
-        `,
+                        linear-gradient(160deg, rgba(0, 0, 75, 0.9), rgba(99, 2, 75, 0.95)),
+                        url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300ffff' fill-opacity='0.2' fill-rule='evenodd'%3E%3Ccircle cx='50' cy='50' r='5'/%3E%3Ccircle cx='10' cy='10' r='3'/%3E%3Ccircle cx='90' cy='90' r='3'/%3E%3Ccircle cx='30' cy='70' r='2'/%3E%3Ccircle cx='70' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E"),
+                        radial-gradient(circle, rgba(4, 255, 255, 0.1) 10%, transparent 20%),
+                        radial-gradient(circle, rgba(50, 255, 255, 0.05) 20%, transparent 30%)
+                    `,
                         backgroundSize: 'cover, 40px 40px, 200px 200px, 300px 300px'
                     }}>
                 </div>
@@ -755,7 +750,7 @@ const CyberFishGame: React.FC = () => {
                         <p className="text-indigo-300 relative">Activate your aquatic avatar</p>
                     </div>
 
-                    {/* Futuristic Form */}
+                    {/* Form for name input */}
                     <form onSubmit={handleNameSubmit} className="flex flex-col items-center relative z-20">
                         <div className="relative w-full mb-6">
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg blur opacity-30"></div>
@@ -791,8 +786,10 @@ const CyberFishGame: React.FC = () => {
     return (
         <div id="cyber-fish" className="w-full max-w-4xl mx-auto p-4">
             <div className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg p-4 shadow-2xl border border-indigo-700">
+                {/* Game Title */}
                 <h2 className="text-3xl text-center mb-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameName}</h2>
 
+                {/* Canvas Container */}
                 <div className="relative w-full" style={{ paddingBottom: '60%', minHeight: '300px', height: '60vh' }}>
                     <canvas
                         ref={canvasRef}
@@ -801,8 +798,10 @@ const CyberFishGame: React.FC = () => {
                         style={{ minHeight: '300px', height: '60vh' }}
                     />
 
+                    {/* Name Input Screen */}
                     {showNameInput && renderFuturisticNameInput()}
 
+                    {/* Start Game Screen */}
                     {!gameStarted && !showNameInput && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center" onClick={startGame}>
                             <div className="bg-black/50 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/30">
@@ -813,6 +812,7 @@ const CyberFishGame: React.FC = () => {
                         </div>
                     )}
 
+                    {/* Game Over Screen */}
                     {gameOver && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
                             <div className="bg-gradient-to-r from-indigo-900/70 to-purple-900/70 p-6 sm:p-8 rounded-xl border border-red-500/30 shadow-lg w-11/12 sm:max-w-md text-center">
@@ -830,17 +830,18 @@ const CyberFishGame: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Score Text */}
+                    {/* Score Display */}
                     <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black bg-opacity-70 backdrop-blur-sm px-4 py-2 rounded-full text-cyan-400 border border-cyan-500/30">
                         Score: {score}
                     </div>
                 </div>
 
+                {/* Game Instructions */}
                 <div className="mt-4 text-center text-sm text-indigo-300">
                     Click or press <span className="font-bold">Space</span> to swim through the neon gates
                 </div>
 
-                {/* Reposition high score table to a side panel on larger screens */}
+                {/* Layout for High Scores and Navigation Guide */}
                 <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div className="lg:col-span-2">
                         <div className="bg-gradient-to-b from-black to-purple-950 bg-opacity-70 backdrop-blur-sm rounded-lg p-4 h-full border border-indigo-800/50">
@@ -856,6 +857,7 @@ const CyberFishGame: React.FC = () => {
                     <div className="lg:col-span-1">
                         {renderHighScores()}
 
+                        {/* Scroll to Current Player's Score Button */}
                         <div className="flex justify-center mt-6">
                             <button
                                 onClick={() => {
@@ -874,12 +876,11 @@ const CyberFishGame: React.FC = () => {
                                 Scroll to My Score
                             </button>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-            {/* Add CSS for animations */}
+            {/* CSS Animations */}
             <style>{`
             @keyframes gridMove {
                 0% { background-position: 0 0; }

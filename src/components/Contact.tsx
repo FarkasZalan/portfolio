@@ -1,43 +1,84 @@
 const Contact = () => {
     return (
         <div id="contact" className="relative max-w-[1040px] m-auto p-6 md:pl-24 py-20 z-10">
+            {/* Section Heading */}
             <div className="mb-12 text-center">
                 <h2 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 animate-move-gradient inline-block">
                     Contact Me
                 </h2>
+                {/* Gradient underline */}
                 <div className="w-20 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 mx-auto mt-4"></div>
             </div>
 
-            <form action="https://getform.io/f/bpjnxogb" method="POST" encType="multipart/form-data" className="flex flex-col gap-6">
+            {/* Contact Form */}
+            <form
+                action="https://getform.io/f/bpjnxogb" // Form submission endpoint
+                method="POST"
+                encType="multipart/form-data"
+                className="flex flex-col gap-6"
+            >
+                {/* Name and Phone Inputs */}
                 <div className="grid md:grid-cols-2 gap-6 w-full py-2">
                     <div className="flex flex-col">
                         <label className="uppercase text-sm py-2 text-white font-medium">Name</label>
-                        <input className="border-2 rounded-lg p-3 flex border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500" type="text" name="name" placeholder="Enter your name" />
+                        <input
+                            className="border-2 rounded-lg p-3 flex border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500"
+                            type="text"
+                            name="name"
+                            placeholder="Enter your name"
+                        />
                     </div>
 
                     <div className="flex flex-col">
                         <label className="uppercase text-sm py-2 text-white font-medium">Phone</label>
-                        <input className="border-2 rounded-lg p-3 flex border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500" type="phone" name="phone" placeholder="Enter your phone number" />
+                        <input
+                            className="border-2 rounded-lg p-3 flex border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500"
+                            type="phone"
+                            name="phone"
+                            placeholder="Enter your phone number"
+                        />
                     </div>
                 </div>
 
+                {/* Email Input */}
                 <div className="flex flex-col py-2">
                     <label className="uppercase text-sm py-2 text-white font-medium">Email</label>
-                    <input className="border-2 rounded-lg p-3 flex border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500" type="email" name="email" placeholder="Enter your email" />
+                    <input
+                        className="border-2 rounded-lg p-3 flex border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500"
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                    />
                 </div>
 
+                {/* Subject Input */}
                 <div className="flex flex-col py-2">
                     <label className="uppercase text-sm py-2 text-white font-medium">Subject</label>
-                    <input className="border-2 rounded-lg p-3 flex border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500" type="text" name="subject" placeholder="Enter the subject" />
+                    <input
+                        className="border-2 rounded-lg p-3 flex border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500"
+                        type="text"
+                        name="subject"
+                        placeholder="Enter the subject"
+                    />
                 </div>
 
+                {/* Message Textarea */}
                 <div className="flex flex-col py-2">
                     <label className="uppercase text-sm py-2 text-white font-medium">Message</label>
-                    <textarea className="border-2 rounded-lg p-3 border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500" rows={10} name="message" placeholder="Type your message here" />
+                    <textarea
+                        className="border-2 rounded-lg p-3 border-gray-700 bg-gray-200 text-gray-800 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all placeholder-gray-500"
+                        rows={10}
+                        name="message"
+                        placeholder="Type your message here"
+                    />
                 </div>
 
+                {/* Submit Button */}
                 <div className="mt-8 text-center">
-                    <button className="inline-flex items-center gap-2 py-3 px-8 bg-gradient-to-r from-cyan-500/50 to-purple-500/50 text-white font-semibold rounded-full border border-purple-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 cursor-pointer">
+                    <button
+                        className="inline-flex items-center gap-2 py-3 px-8 bg-gradient-to-r from-cyan-500/50 to-purple-500/50 text-white font-semibold rounded-full border border-purple-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 cursor-pointer"
+                        type="submit"
+                    >
                         Send Message
                         {/* Send Icon SVG */}
                         <svg
@@ -62,11 +103,9 @@ const Contact = () => {
                         </svg>
                     </button>
                 </div>
-
-
             </form>
         </div>
-    )
-}
+    );
+};
 
 export default Contact;

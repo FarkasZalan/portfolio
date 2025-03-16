@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ResumePdf from '../assets/CV_Zalán_Farkas.pdf';
+import ResumePdf from '../assets/cv/CV_Zalán_Farkas.pdf';
 
 const Resume = () => {
     const [isLoading, setIsLoading] = useState(true);

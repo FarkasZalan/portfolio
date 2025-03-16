@@ -5,6 +5,8 @@ import VegAndFruImage from "../assets/images/vegAndFru.png";
 import GymBroImage from "../assets/images/gymBro.png";
 
 const Projects = () => {
+
+    // List of projects
     const projectList = [
         {
             img: GymBroImage,
@@ -44,7 +46,7 @@ const Projects = () => {
             <div className="grid sm:grid-cols-2 gap-8">
                 {projectList.map((project, index) => (
                     <ProjectItem
-                        key={index}
+                        key={index} // Unique key for each item
                         img={project.img}
                         title={project.title}
                         technologies={project.technologies}

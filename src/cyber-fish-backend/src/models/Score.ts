@@ -1,5 +1,6 @@
 import { Schema, model, Document } from "mongoose";
 
+// Define the interface for the Score document
 interface IScore extends Document {
     name: string;
     score: number;
@@ -14,4 +15,5 @@ const ScoreSchema = new Schema<IScore>({
     collection: "Scores"
 });
 
+// Create and export the Score model based on the schema
 export const Score = model<IScore>("Score", ScoreSchema);

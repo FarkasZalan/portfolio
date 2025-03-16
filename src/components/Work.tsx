@@ -1,5 +1,6 @@
 import WorkItem from "./WorkItem";
 
+// Work experience data
 const data = [
     {
         year: 2024,
@@ -23,20 +24,24 @@ const Work = () => {
     return (
         <div id="work" className="relative max-w-[1040px] m-auto p-6 md:pl-24 py-20 z-10">
             <div className="mb-14 text-center">
+                {/* Section Heading */}
                 <h2 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 animate-move-gradient inline-block">
                     Work Experience
                 </h2>
+
+                {/* Gradient underline */}
                 <div className="w-20 h-1 bg-gradient-to-r from-cyan-400 to-purple-400 mx-auto mt-4"></div>
             </div>
 
+            {/* Timeline Container */}
             <div className="relative">
-                {/* Main timeline line - solid color */}
+                {/* Main timeline line */}
                 <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-cyan-400/80"></div>
 
                 {/* Work items */}
                 {data.map((item, idx) => (
                     <WorkItem
-                        key={idx.toString()}
+                        key={idx.toString()} // Unique key for each item
                         year={item.year.toString()}
                         title={item.title}
                         company={item.company}

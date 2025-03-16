@@ -7,7 +7,7 @@ const Main = () => {
             {/* Content */}
             <div className="w-full h-screen absolute top-0 left-0 text-white flex flex-col justify-center items-center">
                 <div className='max-w-[700px] m-auto h-full w-full flex flex-col justify-center items-center lg:items-start'>
-                    {/* Name with Enhanced Glow Effect */}
+                    {/* Name */}
                     <h1 className='sm:text-5xl text-4xl font-bold font-mono text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 hover:bg-gradient-to-r hover:from-pink-400 hover:to-cyan-400 transition-all duration-500 drop-shadow-[0_0_15px_rgba(6,182,212,0.5)]'>
                         I'm Zalán Farkas
                     </h1>
@@ -32,7 +32,7 @@ const Main = () => {
                         />
                     </h2>
 
-                    {/* Social Icons with Hover Glow */}
+                    {/* Social Icons */}
                     <div className='flex justify-between pt-8 max-w-[100px] w-full'>
                         <a
                             href="https://www.linkedin.com/in/zalanfarkas/"

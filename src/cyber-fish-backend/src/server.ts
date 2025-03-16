@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import connectDB from './db';
-import { Score } from './models/Score';
+import connectDB from './db'; // Import the MongoDB connection function
+import { Score } from './models/Score'; // Import the Score model
 
 const app = express();
 
@@ -10,55 +10,60 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
+app.use(cors()); // Enable CORS for cross-origin requests
+app.use(bodyParser.json()); // Parse incoming JSON data in request bodies
 
 // Routes
+
+// GET /api/scores - Fetch all scores sorted in descending order
 app.get('/api/scores', async (req: Request, res: Response) => {
     try {
+        // Fetch all scores from the database and sort them by score in descending order
         const scores = await Score.find().sort({ score: -1 });
-        res.json(scores);
+        res.json(scores); // Send the scores as a JSON response
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Failed to fetch scores' });
+        res.status(500).json({ error: 'Failed to fetch scores' }); // Handle errors
     }
 });
 
+// POST /api/scores - Save or update a player's score
 app.post('/api/scores', async (req: Request, res: Response) => {
     try {
         const { name, score } = req.body;
 
-        // Find the existing score for this player
+        // Check if the player already has a score in the database
         const existingScore = await Score.findOne({ name });
 
         if (existingScore) {
-            // Only update if the new score is higher
+            // If the player exists, update their score only if the new score is higher
             if (score > existingScore.score) {
                 existingScore.score = score;
                 existingScore.date = new Date();
-                await existingScore.save();
+                await existingScore.save(); // Save the updated score
             }
         } else {
-            // Create a new score entry if player doesn't exist
+            // If the player doesn't exist, create a new score entry
             const newScore = new Score({ name, score, date: new Date() });
-            await newScore.save();
+            await newScore.save(); // Save the new score
         }
 
-        res.status(201).json({ message: 'Score saved successfully' });
+        res.status(201).json({ message: 'Score saved successfully' }); // Send success response
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Failed to save score' });
+        res.status(500).json({ error: 'Failed to save score' }); // Handle errors
     }
 });
 
+// GET /api/scores/check-name - Check if a player name already exists
 app.get('/api/scores/check-name', async (req: Request, res: Response) => {
     try {
         const { name } = req.query;
-        const exists = await Score.exists({ name });
-        res.json({ exists });
+        const exists = await Score.exists({ name }); // Check if the name exists in the database
+        res.json({ exists }); // Send the result as a JSON response
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Failed to check name' });
+        res.status(500).json({ error: 'Failed to check name' }); // Handle errors
     }
 });
 

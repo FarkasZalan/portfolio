@@ -5,7 +5,7 @@ import { GrProjects } from "react-icons/gr";
 import { LuGamepad2 } from "react-icons/lu";
 
 export const SideNav = () => {
-    const [nav, setNav] = useState(false);
+    const [nav, setNav] = useState(false); // State to manage mobile navigation visibility
 
     // Toggle mobile navigation
     const handleNav = () => {

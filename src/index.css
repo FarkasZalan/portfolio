@@ -81,7 +81,7 @@
     display: block;
 }
 
-/* Add random star positions using multiple box-shadows */
+/* Add random star positions using multiple box-shadows for tha main background */
 #stars:after {
     content: '';
     position: absolute;
