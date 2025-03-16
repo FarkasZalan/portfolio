@@ -216,3 +216,51 @@
 .desktop-nav-item:hover .nav-text {
     opacity: 1;
 }
+
+/*High score table*/
+/* Highlight the current player row */
+/* Add glow effect to medals */
+.text-yellow-400 {
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+}
+
+.text-gray-300 {
+    text-shadow: 0 0 8px rgba(192, 192, 192, 0.8);
+}
+
+.text-amber-700 {
+    text-shadow: 0 0 8px rgba(205, 127, 50, 0.8);
+}
+
+.current-player {
+    background: linear-gradient(145deg, rgba(37, 99, 235, 0.1), rgba(99, 102, 241, 0.05)); /* blue-600 to indigo-500 with transparency */
+    border-left: 3px solid #2c9be6; /* blue-600 */
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.2); /* blue-600 with transparency */
+    padding: 10px; /* Default padding for larger screens */
+}
+
+.current-player td {
+    font-weight: bold;
+    color: #2c9be6; /* blue-600 */
+    padding: 3px; /* Default padding for larger screens */
+}
+
+/* Custom scrollbar */
+.high-scores-table::-webkit-scrollbar {
+    width: 10px;
+}
+
+.high-scores-table::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.high-scores-table::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #2563eb, #6366f1); /* blue-600 to indigo-500 */
+    border-radius: 5px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.high-scores-table::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #1e40af, #4f46e5); /* darker shades for hover */
+}

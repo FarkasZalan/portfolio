@@ -32,7 +32,9 @@ const CyberFishGame: React.FC = () => {
     const [highScores, setHighScores] = useState<Score[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [gameName] = useState('Cyber Fish'); // Updated game name
+    const [gameName] = useState('Cyber Fish');
+    const hasSavedScore = useRef(false); // Flag to track if score has been saved
+    const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]); // Refs for each row in the high score table to scroll to the current player
 
     // Game constants - adjusted for smoother gameplay
     const GRAVITY = 0.2;         // Reduced gravity for smoother falling
@@ -80,7 +82,7 @@ const CyberFishGame: React.FC = () => {
     const fetchHighScores = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch('/api/scores');
+            const response = await fetch('http://localhost:3000/api/scores');
             if (!response.ok) {
                 throw new Error('Failed to fetch scores');
             }
@@ -88,6 +90,7 @@ const CyberFishGame: React.FC = () => {
             setHighScores(data);
             setIsLoading(false);
         } catch (error) {
+            console.error(error);
             setErrorMessage('Failed to load high scores');
             setIsLoading(false);
         }
@@ -96,7 +99,7 @@ const CyberFishGame: React.FC = () => {
     // Save score
     const saveScore = async (name: string, scoreValue: number) => {
         try {
-            const response = await fetch('/api/scores', {
+            const response = await fetch('http://localhost:3000/api/scores', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -113,6 +116,12 @@ const CyberFishGame: React.FC = () => {
             setErrorMessage('Failed to save score');
         }
     };
+
+    // Reset row refs when high scores change
+    useEffect(() => {
+        rowRefs.current = rowRefs.current.slice(0, highScores.length);
+    }, [highScores]);
+
 
     // Handle jump with spacebar too
     useEffect(() => {
@@ -236,6 +245,7 @@ const CyberFishGame: React.FC = () => {
         gameRef.current.pipes = [];
         gameRef.current.frameCount = 0;
         setScore(0);
+        setScore(0);
         setGameOver(false);
         setGameStarted(false); // Add this line to reset the gameStarted state
         resetFish();
@@ -252,16 +262,37 @@ const CyberFishGame: React.FC = () => {
     };
 
     // Handle name submission
-    const handleNameSubmit = (e: React.FormEvent) => {
+    const handleNameSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (playerName.trim()) {
-            gameRef.current.currentPlayerName = playerName.trim();
-            setShowNameInput(false);
-            setErrorMessage(''); // Clear any previous error message
+            const nameExists = await checkNameExists(playerName.trim());
+            if (nameExists) {
+                setErrorMessage('Name already exists. Please choose a different name.');
+            } else {
+                gameRef.current.currentPlayerName = playerName.trim();
+                setShowNameInput(false);
+                setErrorMessage(''); // Clear any previous error message
+            }
+        }
+    };
+
+    const checkNameExists = async (name: string): Promise<boolean> => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/scores/check-name?name=${encodeURIComponent(name)}`);
+            if (!response.ok) {
+                throw new Error('Failed to check name');
+            }
+            const data = await response.json();
+            return data.exists; // Assuming the API returns { exists: boolean }
+        } catch (error) {
+            console.error(error);
+            setErrorMessage('Failed to check name:');
+            return false;
         }
     };
 
     const startGame = () => {
+        hasSavedScore.current = false;
         if (!gameRef.current.currentPlayerName) {
             setErrorMessage('Please enter your name to start the game.');
             return;
@@ -270,6 +301,8 @@ const CyberFishGame: React.FC = () => {
         if (gameOver) {
             resetGame();
         }
+
+
 
         // Only start the game if it's not already started
         if (!gameRef.current.playing) {
@@ -599,13 +632,19 @@ const CyberFishGame: React.FC = () => {
 
         // Check collisions
         if (gameRef.current.playing && checkCollisions()) {
+            // Get the current score from the state updater function
+            setScore((currentScore) => {
+                // Save score to database using the current score value
+                if (gameRef.current.currentPlayerName && currentScore > 0 && !hasSavedScore.current) {
+                    saveScore(gameRef.current.currentPlayerName, currentScore);
+                    hasSavedScore.current = true;
+                }
+                return currentScore; // Return the same score, no change needed
+            });
+
+            // Update game state
             gameRef.current.playing = false;
             setGameOver(true);
-
-            // Save score to database
-            if (gameRef.current.currentPlayerName && score > 0) {
-                saveScore(gameRef.current.currentPlayerName, score);
-            }
 
             cancelAnimationFrame(gameRef.current.animationFrameId);
             gameRef.current.animationFrameId = 0;
@@ -619,7 +658,7 @@ const CyberFishGame: React.FC = () => {
     // Render high scores
     const renderHighScores = () => {
         return (
-            <div className="bg-gradient-to-b from-black to-purple-950 bg-opacity-70 rounded-lg p-3 max-h-48 overflow-y-auto border border-indigo-800">
+            <div className="bg-gradient-to-b from-gray-900 to-gray-800 bg-opacity-90 rounded-lg p-3 max-h-48 overflow-y-auto border border-gray-700 high-scores-table">
                 <h3 className="text-cyan-400 text-lg font-semibold mb-2">Top Fish</h3>
                 {isLoading ? (
                     <p className="text-indigo-300">Loading scores...</p>
@@ -636,15 +675,43 @@ const CyberFishGame: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {highScores.map((entry, index) => (
-                                <tr key={index} className="text-indigo-200 border-t border-indigo-800">
-                                    <td className="py-1">{index + 1}</td>
-                                    <td className="py-1">{entry.name}</td>
-                                    <td className="py-1 text-right">{entry.score}</td>
-                                    <td className="py-1 text-right">{new Date(entry.date).toLocaleDateString()}</td>
-                                </tr>
-                            ))}
+                            {highScores.map((entry, index) => {
+                                const isCurrentPlayer = entry.name === gameRef.current.currentPlayerName;
+                                const rowClass = `
+                                    ${isCurrentPlayer ? 'current-player' : ''}
+                                    high-score-row
+                                `;
+
+                                // Medal icons for top 3 players
+                                const rankDisplay =
+                                    index === 0 ? (
+                                        <span className="text-yellow-400 text-xl">🥇</span>
+                                    ) : index === 1 ? (
+                                        <span className="text-gray-300 text-xl">🥈</span>
+                                    ) : index === 2 ? (
+                                        <span className="text-amber-700 text-xl">🥉</span>
+                                    ) : (
+                                        index + 1
+                                    );
+
+                                return (
+                                    <tr
+                                        key={index}
+                                        ref={(el) => (rowRefs.current[index] = el)} // Assign ref to each row
+                                        className={`${rowClass} text-indigo-200 border-t border-indigo-800`}
+                                    >
+                                        <td className="py-1">{rankDisplay}</td>
+                                        <td className="py-1 truncate max-w-[50px] overflow-hidden text-ellipsis whitespace-nowrap" title={entry.name}>
+                                            {entry.name}
+                                        </td>
+                                        <td className="py-1 text-right">{entry.score}</td>
+                                        <td className="py-1 text-right">{new Date(entry.date).toLocaleDateString()}</td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
+
+
                     </table>
                 ) : (
                     <p className="text-indigo-300">No scores yet. Be the first!</p>
@@ -788,6 +855,26 @@ const CyberFishGame: React.FC = () => {
                     </div>
                     <div className="lg:col-span-1">
                         {renderHighScores()}
+
+                        <div className="flex justify-center mt-6">
+                            <button
+                                onClick={() => {
+                                    const currentPlayerIndex = highScores.findIndex(
+                                        (entry) => entry.name === gameRef.current.currentPlayerName
+                                    );
+                                    if (currentPlayerIndex !== -1) {
+                                        rowRefs.current[currentPlayerIndex]?.scrollIntoView({
+                                            behavior: 'smooth',
+                                            block: 'center',
+                                        });
+                                    }
+                                }}
+                                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white rounded-full focus:ring focus:ring-blue-400/50 transition transform hover:scale-105 cursor-pointer text-lg font-semibold shadow-lg"
+                            >
+                                Scroll to My Score
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
