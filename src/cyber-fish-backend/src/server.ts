@@ -16,7 +16,7 @@ app.use(bodyParser.json()); // Parse incoming JSON data in request bodies
 // Routes
 
 // GET /api/scores - Fetch all scores sorted in descending order
-app.get('/api/scores', async (req: Request, res: Response) => {
+app.get('/api/scores', async (res: Response) => {
     try {
         // Fetch all scores from the database and sort them by score in descending order
         const scores = await Score.find().sort({ score: -1 });
