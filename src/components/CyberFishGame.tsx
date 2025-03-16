@@ -83,7 +83,7 @@ const CyberFishGame: React.FC = () => {
     const fetchHighScores = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch('http://localhost:3000/api/scores');
+            const response = await fetch('https://cyber-fish-backend.onrender.com/api/scores');
             if (!response.ok) {
                 throw new Error('Failed to fetch scores');
             }
@@ -100,7 +100,7 @@ const CyberFishGame: React.FC = () => {
     // Save score to the API
     const saveScore = async (name: string, scoreValue: number) => {
         try {
-            const response = await fetch('http://localhost:3000/api/scores', {
+            const response = await fetch('https://cyber-fish-backend.onrender.com/api/scores', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -277,7 +277,7 @@ const CyberFishGame: React.FC = () => {
     // Check if a player name already exists in the high scores
     const checkNameExists = async (name: string): Promise<boolean> => {
         try {
-            const response = await fetch(`http://localhost:3000/api/scores/check-name?name=${encodeURIComponent(name)}`);
+            const response = await fetch(`https://cyber-fish-backend.onrender.com/api/scores/check-name?name=${encodeURIComponent(name)}`);
             if (!response.ok) {
                 throw new Error('Failed to check name');
             }
