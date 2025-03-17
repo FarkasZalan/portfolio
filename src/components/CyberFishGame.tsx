@@ -33,6 +33,7 @@ const CyberFishGame: React.FC = () => {
     const [highScores, setHighScores] = useState<Score[]>([]); // List of high scores
     const [isLoading, setIsLoading] = useState(false); // Loading state for high scores
     const [errorMessage, setErrorMessage] = useState(''); // Error message for user feedback
+    const [nameInputError, setNameInputError] = useState(''); // Error message for name input
     const [gameName] = useState('Cyber Fish'); // Game name
     const hasSavedScore = useRef(false); // Flag to track if score has been saved
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]); // Refs for each row in the high score table to scroll to the current player
@@ -265,11 +266,13 @@ const CyberFishGame: React.FC = () => {
         if (playerName.trim()) {
             const nameExists = await checkNameExists(playerName.trim());
             if (nameExists) {
-                setErrorMessage('Name already exists. Please choose a different name.');
+                setNameInputError('Name already exists. Please choose a different name.');
+                setErrorMessage('');
             } else {
                 gameRef.current.currentPlayerName = playerName.trim();
                 setShowNameInput(false);
                 setErrorMessage(''); // Clear any previous error message
+                setNameInputError('');
             }
         }
     };
@@ -285,7 +288,7 @@ const CyberFishGame: React.FC = () => {
             return data.exists; // Assuming the API returns { exists: boolean }
         } catch (error) {
             console.error(error);
-            setErrorMessage('Failed to check name:');
+            setNameInputError('Failed to check name:');
             return false;
         }
     };
@@ -763,9 +766,9 @@ const CyberFishGame: React.FC = () => {
                             />
                         </div>
 
-                        {errorMessage && (
+                        {nameInputError && (
                             <div className="text-red-400 mb-4 font-mono text-sm w-full bg-red-900/20 border border-red-800 rounded p-2">
-                                {errorMessage}
+                                {nameInputError}
                             </div>
                         )}
 

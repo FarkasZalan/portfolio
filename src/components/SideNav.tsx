@@ -149,10 +149,10 @@ export const SideNav = () => {
 
                     <a
                         onClick={() => handleClick("cyber-fish")}
-                        className="relative flex items-center rounded-full bg-pink-400/10 border border-pink-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-pink-400/20 backdrop-blur-sm group overflow-hidden w-13.5 hover:w-32 transition-all duration-300"
+                        className="relative flex items-center rounded-full bg-pink-400/10 border border-pink-400/30 m-2 p-4 cursor-pointer hover:scale-110 ease-in duration-200 hover:bg-pink-400/20 backdrop-blur-sm group overflow-hidden w-13.5 hover:w-36 transition-all duration-300"
                     >
                         <LuGamepad2 size={20} className="text-pink-400 min-w-[20px]" />
-                        <span className="text-pink-400 ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span className="text-pink-400 ml-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pr-2">
                             Cyber Fish
                         </span>
                     </a>
