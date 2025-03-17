@@ -264,3 +264,9 @@
 .high-scores-table::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(45deg, #1e40af, #4f46e5); /* darker shades for hover */
 }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* make sure there's no horizontal scroll */
+  }

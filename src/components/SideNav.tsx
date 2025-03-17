@@ -95,7 +95,7 @@ export const SideNav = () => {
             </div>
 
             {/* Desktop Navigation Menu */}
-            <div className="md:block hidden fixed top-[25%] z-10">
+            <div className="md:block hidden fixed top-[25%] z-10 left-2">
                 <div className="flex flex-col">
                     <a
                         onClick={() => handleClick("main")}
