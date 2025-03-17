@@ -39,16 +39,16 @@ const CyberFishGame: React.FC = () => {
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]); // Refs for each row in the high score table to scroll to the current player
     const [isInitialized, setIsInitialized] = useState(false);
 
+    // Check if it's a small device
+    const isSmallDevice = window.innerWidth < 768;
+
     // Game constants
     const GRAVITY = 0.2; // Gravity affecting the Fish
     const JUMP_FORCE = -6; // Force applied when the fish jumps
     const PIPE_WIDTH = 80; // Width of the pipes
-    const INITIAL_PIPE_SPEED = 2; // Initial speed of the pipes
-    const INITIAL_PIPE_INTERVAL = 180; // Initial interval between pipes
-    const INITIAL_PIPE_GAP = 220; // Initial gap between pipes
-
-    // Check if it's a small device
-    const isSmallDevice = window.innerWidth < 768;
+    const INITIAL_PIPE_SPEED = isSmallDevice ? 3 : 2; // Faster speed on small devices
+    const INITIAL_PIPE_INTERVAL = isSmallDevice ? 150 : 180; // Smaller interval on small devices
+    const INITIAL_PIPE_GAP = isSmallDevice ? 200 : 220; // Smaller gap on small devices
 
     // Game state refs (to avoid re-renders)
     const gameRef = useRef({
@@ -153,7 +153,10 @@ const CyberFishGame: React.FC = () => {
             const speedIncrease = Math.floor(score / 5); // Increase speed every 5 points
             const gapIncrease = Math.floor(score / 10); // Increase gap every 10 points
 
-            gameRef.current.pipeSpeed = INITIAL_PIPE_SPEED + speedIncrease * 0.5;
+            // Apply a multiplier for small devices
+            const smallDeviceMultiplier = isSmallDevice ? 1.2 : 1;
+
+            gameRef.current.pipeSpeed = (INITIAL_PIPE_SPEED + speedIncrease * 0.5) * smallDeviceMultiplier;
             gameRef.current.pipeInterval = Math.max(INITIAL_PIPE_INTERVAL - speedIncrease * 10, 100); // Minimum interval of 100
             gameRef.current.pipeGap = INITIAL_PIPE_GAP + gapIncrease * 10; // Increase gap to maintain playability
         }
