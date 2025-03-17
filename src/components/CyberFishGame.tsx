@@ -37,6 +37,7 @@ const CyberFishGame: React.FC = () => {
     const [gameName] = useState('Cyber Fish'); // Game name
     const hasSavedScore = useRef(false); // Flag to track if score has been saved
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]); // Refs for each row in the high score table to scroll to the current player
+    const [isInitialized, setIsInitialized] = useState(false);
 
     // Game constants
     const GRAVITY = 0.2; // Gravity affecting the Fish
@@ -176,6 +177,11 @@ const CyberFishGame: React.FC = () => {
             // Initialize nebulas
             initializeNebulas();
 
+            // Mark the game as initialized after a short delay
+            setTimeout(() => {
+                setIsInitialized(true);
+            }, 500);
+
             gameLoop(); // Start rendering without starting the game
         };
 
@@ -237,6 +243,11 @@ const CyberFishGame: React.FC = () => {
         const { canvasHeight } = gameRef.current;
         gameRef.current.fish.y = canvasHeight / 2 - gameRef.current.fish.height / 2;
         gameRef.current.fish.velocity = 0;
+
+        // Force the fish to stay in place until game starts
+        if (!gameRef.current.playing) {
+            gameRef.current.fish.y = canvasHeight / 2 - gameRef.current.fish.height / 2;
+        }
     };
 
     // Reset game state
@@ -295,6 +306,11 @@ const CyberFishGame: React.FC = () => {
 
     // Start the game
     const startGame = () => {
+        // Make sure the game is initialized before starting
+        if (!isInitialized) {
+            return;
+        }
+
         hasSavedScore.current = false;
         if (!gameRef.current.currentPlayerName) {
             setErrorMessage('Please enter your name to start the game.');
@@ -306,12 +322,18 @@ const CyberFishGame: React.FC = () => {
         }
 
         if (!gameRef.current.playing) {
-            gameRef.current.playing = true;
-            setGameStarted(true);
-            setGameOver(false);
-            if (!gameRef.current.animationFrameId) {
-                gameLoop();
-            }
+            // Reset fish position one more time on game start
+            resetFish();
+
+            // Add a small delay before starting the game
+            setTimeout(() => {
+                gameRef.current.playing = true;
+                setGameStarted(true);
+                setGameOver(false);
+                if (!gameRef.current.animationFrameId) {
+                    gameLoop();
+                }
+            }, 200); // 200ms delay
         }
     };
 
@@ -329,6 +351,10 @@ const CyberFishGame: React.FC = () => {
 
     // Handle game input (click, tap or spacebar)
     const handleInput = () => {
+        if (!isInitialized) {
+            return;
+        }
+
         if (!gameRef.current.currentPlayerName) {
             setErrorMessage('Please enter your name to start the game.');
             return;
@@ -339,7 +365,7 @@ const CyberFishGame: React.FC = () => {
         } else {
             jump();
         }
-    }
+    };
 
     // Create a pipe
     const createPipe = () => {
@@ -576,9 +602,17 @@ const CyberFishGame: React.FC = () => {
 
         // Update fish position for hovering effect
         if (!gameRef.current.playing) {
-            fish.y = canvasHeight / 2 - fish.height / 2 + Math.sin(gameRef.current.frameCount * hoverFrequency) * hoverAmplitude;
+            // Only apply hover effect if initialized
+            if (isInitialized) {
+                fish.y = canvasHeight / 2 - fish.height / 2 + Math.sin(gameRef.current.frameCount * hoverFrequency) * hoverAmplitude;
+            } else {
+                // Keep fish in center until initialized
+                fish.y = canvasHeight / 2 - fish.height / 2;
+            }
+            // Always reset velocity when not playing
+            fish.velocity = 0;
         } else {
-            // Update fish with gravity
+            // Update fish with gravity only when playing
             fish.velocity += GRAVITY;
             fish.y += fish.velocity;
         }
@@ -834,9 +868,11 @@ const CyberFishGame: React.FC = () => {
                     )}
 
                     {/* Score Display */}
-                    <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black bg-opacity-70 backdrop-blur-sm px-4 py-2 rounded-full text-cyan-400 border border-cyan-500/30">
-                        Score: {score}
-                    </div>
+                    {!gameOver && !showNameInput && (
+                        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black bg-opacity-70 backdrop-blur-sm px-4 py-2 rounded-full text-cyan-400 border border-cyan-500/30">
+                            Score: {score}
+                        </div>
+                    )}
                 </div>
 
                 {/* Game Instructions */}
