@@ -255,10 +255,12 @@ const CyberFishGame: React.FC = () => {
         gameRef.current.pipes = [];
         gameRef.current.frameCount = 0;
         setScore(0);
-        setScore(0);
         setGameOver(false);
         setGameStarted(false);
-        resetFish();
+
+        // Reset fish position and explicitly set velocity to 0
+        gameRef.current.fish.y = gameRef.current.canvasHeight / 2 - gameRef.current.fish.height / 2;
+        gameRef.current.fish.velocity = 0;
 
         // Reset dynamic difficulty variables
         gameRef.current.pipeSpeed = INITIAL_PIPE_SPEED;
@@ -306,11 +308,6 @@ const CyberFishGame: React.FC = () => {
 
     // Start the game
     const startGame = () => {
-        // Make sure the game is initialized before starting
-        if (!isInitialized) {
-            return;
-        }
-
         hasSavedScore.current = false;
         if (!gameRef.current.currentPlayerName) {
             setErrorMessage('Please enter your name to start the game.');
@@ -322,10 +319,11 @@ const CyberFishGame: React.FC = () => {
         }
 
         if (!gameRef.current.playing) {
-            // Reset fish position one more time on game start
-            resetFish();
+            // Reset fish position and velocity one more time before starting
+            gameRef.current.fish.y = gameRef.current.canvasHeight / 2 - gameRef.current.fish.height / 2;
+            gameRef.current.fish.velocity = 0;
 
-            // Add a small delay before starting the game
+            // Set a small delay before activating physics
             setTimeout(() => {
                 gameRef.current.playing = true;
                 setGameStarted(true);
@@ -333,7 +331,7 @@ const CyberFishGame: React.FC = () => {
                 if (!gameRef.current.animationFrameId) {
                     gameLoop();
                 }
-            }, 200); // 200ms delay
+            }, 300); // 300ms delay
         }
     };
 
