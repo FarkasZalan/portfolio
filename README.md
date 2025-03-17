@@ -5,8 +5,8 @@
 ## 🌟 Features
 
 ### **Portfolio**
-- **About Me**: A brief introduction about me, my skills, and my journey as a developer.
-- **Projects**: A showcase of my notable projects with descriptions, technologies used, and links to live demos or repositories.
+- **Work experience**: A detailed section highlighting my professional roles, responsibilities.
+- **Projects**: A showcase of my notable projects with descriptions, technologies used, and links to git repositories.
 - **Resume**: A downloadable resume and a summary of my professional experience.
 - **Contact**: A form to get in touch with me directly.
 
