@@ -842,7 +842,7 @@ const CyberFishGame: React.FC = () => {
                 </div>
 
                 {/* Layout for High Scores and Navigation Guide */}
-                <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-4">
                     <div className="lg:col-span-2">
                         <div className="bg-gradient-to-b from-black to-purple-950 bg-opacity-70 backdrop-blur-sm rounded-lg p-4 h-full border border-indigo-800/50">
                             <h3 className="text-cyan-400 text-lg font-semibold mb-2">Navigation Guide</h3>
@@ -854,7 +854,7 @@ const CyberFishGame: React.FC = () => {
                             </ul>
                         </div>
                     </div>
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-2">
                         {renderHighScores()}
 
                         {/* Scroll to Current Player's Score Button */}
