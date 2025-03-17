@@ -46,7 +46,7 @@ const CyberFishGame: React.FC = () => {
     const GRAVITY = 0.2; // Gravity affecting the Fish
     const JUMP_FORCE = -6; // Force applied when the fish jumps
     const PIPE_WIDTH = 80; // Width of the pipes
-    const INITIAL_PIPE_SPEED = isSmallDevice ? 3 : 2; // Faster speed on small devices
+    const INITIAL_PIPE_SPEED = 2; // Faster speed on small devices
     const INITIAL_PIPE_INTERVAL = isSmallDevice ? 150 : 180; // Smaller interval on small devices
     const INITIAL_PIPE_GAP = isSmallDevice ? 200 : 220; // Smaller gap on small devices
 
@@ -183,7 +183,7 @@ const CyberFishGame: React.FC = () => {
             // Mark the game as initialized after a short delay
             setTimeout(() => {
                 setIsInitialized(true);
-            }, 500);
+            }, 100);
 
             gameLoop(); // Start rendering without starting the game
         };
@@ -334,7 +334,7 @@ const CyberFishGame: React.FC = () => {
                 if (!gameRef.current.animationFrameId) {
                     gameLoop();
                 }
-            }, 300); // 300ms delay
+            }, 100); // 300ms delay
         }
     };
 
