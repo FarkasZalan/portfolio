@@ -1,0 +1,13 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background Circle -->
+  <circle cx="32" cy="32" r="30" fill="#1a1a1a" />
+  
+  <!-- Futuristic Hexagon -->
+  <polygon points="32,8 48,16 48,32 32,40 16,32 16,16" fill="none" stroke="#00ffcc" stroke-width="2" />
+  
+  <!-- Inner Glow Effect -->
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#00ffcc" stroke-width="1" stroke-opacity="0.5" />
+  
+  <!-- Central Dot -->
+  <circle cx="32" cy="32" r="4" fill="#00ffcc" />
+</svg>
