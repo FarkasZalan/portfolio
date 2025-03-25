@@ -38,6 +38,9 @@ const CyberFishGame: React.FC = () => {
     const hasSavedScore = useRef(false); // Flag to track if score has been saved
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]); // Refs for each row in the high score table to scroll to the current player
     const [isInitialized, setIsInitialized] = useState(false);
+    const [isCheckingName, setIsCheckingName] = useState(false);
+    const [isSavingScore, setIsSavingScore] = useState(false);
+
 
     // Check if it's a small device
     const isSmallDevice = window.innerWidth < 768;
@@ -85,38 +88,69 @@ const CyberFishGame: React.FC = () => {
     const fetchHighScores = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch('https://cyber-fish-backend.onrender.com/api/scores');
+            setErrorMessage('');
+
+            // Add timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+            const response = await fetch('https://cyber-fish-backend.onrender.com/api/scores', {
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
             if (!response.ok) {
                 throw new Error('Failed to fetch scores');
             }
+
             const data = await response.json();
             setHighScores(data);
             setIsLoading(false);
-        } catch (error) {
-            console.error(error);
-            setErrorMessage('Failed to load high scores');
+        } catch (error: any) {
             setIsLoading(false);
+            if (error.name === 'AbortError') {
+                setErrorMessage('Server is waking up. Scores will load shortly.');
+            } else {
+                setErrorMessage('Failed to load high scores');
+            }
         }
     };
 
     // Save score to the API
     const saveScore = async (name: string, scoreValue: number) => {
         try {
+            setIsSavingScore(true);
+            setErrorMessage('');
+
+            // Add timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
             const response = await fetch('https://cyber-fish-backend.onrender.com/api/scores', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ name, score: scoreValue, date: new Date() }),
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
 
             if (!response.ok) {
                 throw new Error('Failed to save score');
             }
 
             fetchHighScores(); // Refresh high scores after saving
-        } catch (error) {
-            setErrorMessage('Failed to save score');
+            setIsSavingScore(false);
+        } catch (error: any) {
+            setIsSavingScore(false);
+            if (error.name === 'AbortError') {
+                setErrorMessage('Server is waking up. Your score will be saved shortly.');
+            } else {
+                setErrorMessage('Failed to save score. Please try again.');
+            }
         }
     };
 
@@ -296,15 +330,34 @@ const CyberFishGame: React.FC = () => {
     // Check if a player name already exists in the high scores
     const checkNameExists = async (name: string): Promise<boolean> => {
         try {
-            const response = await fetch(`https://cyber-fish-backend.onrender.com/api/scores/check-name?name=${encodeURIComponent(name)}`);
+            setIsCheckingName(true);
+            setNameInputError('');
+
+            // Add a timeout for the fetch request
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+            const response = await fetch(
+                `https://cyber-fish-backend.onrender.com/api/scores/check-name?name=${encodeURIComponent(name)}`,
+                { signal: controller.signal }
+            );
+
+            clearTimeout(timeoutId);
+
             if (!response.ok) {
                 throw new Error('Failed to check name');
             }
+
             const data = await response.json();
-            return data.exists; // Assuming the API returns { exists: boolean }
-        } catch (error) {
-            console.error(error);
-            setNameInputError('Failed to check name:');
+            setIsCheckingName(false);
+            return data.exists;
+        } catch (error: any) {
+            setIsCheckingName(false);
+            if (error.name === 'AbortError') {
+                setNameInputError('Server is waking up. Please try again in a moment.');
+            } else {
+                setNameInputError('Failed to check name. Please try again.');
+            }
             return false;
         }
     };
@@ -689,16 +742,57 @@ const CyberFishGame: React.FC = () => {
     const renderHighScores = () => {
         return (
             <div className="bg-gradient-to-b from-gray-900 to-gray-800 bg-opacity-90 rounded-lg p-3 max-h-48 overflow-y-auto border border-gray-700 high-scores-table">
-                {/* Table Header */}
-                <h3 className="text-cyan-400 text-lg font-semibold mb-2">Top Fish</h3>
+                {/* Table Header with Connection Status */}
+                <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-cyan-400 text-lg font-semibold">Top Fish</h3>
+                    <div className="flex items-center">
+                        <div
+                            className={`w-2 h-2 rounded-full mr-1 ${isLoading || isCheckingName || isSavingScore ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}
+                            title={isLoading || isCheckingName || isSavingScore ? 'Connecting to server...' : 'Server connected'}
+                        ></div>
+                        <span className="text-xs text-indigo-300">
+                            {isLoading || isCheckingName || isSavingScore ? 'Connecting...' : 'Online'}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Loading State */}
                 {isLoading ? (
-                    // Loading state
-                    <p className="text-indigo-300">Loading scores...</p>
+                    <div className="flex flex-col items-center justify-center py-4">
+                        <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                        <p className="text-indigo-300 text-sm">
+                            {errorMessage || "Connecting to galactic database..."}
+                        </p>
+                        {errorMessage && (
+                            <button
+                                onClick={fetchHighScores}
+                                className="mt-2 px-3 py-1 bg-indigo-700 hover:bg-indigo-600 rounded text-xs cursor-pointer"
+                            >
+                                Retry Connection
+                            </button>
+                        )}
+                    </div>
                 ) : errorMessage ? (
-                    // Error state
-                    <p className="text-red-400">{errorMessage}</p>
+                    // Error State
+                    <div className="text-center py-4">
+                        <p className="text-red-400 mb-2">{errorMessage}</p>
+                        <div className="flex justify-center space-x-2">
+                            <button
+                                onClick={fetchHighScores}
+                                className="px-3 py-1 bg-indigo-700 hover:bg-indigo-600 rounded text-sm cursor-pointer"
+                            >
+                                Retry
+                            </button>
+                            <button
+                                onClick={() => setErrorMessage('')}
+                                className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm cursor-pointer"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
                 ) : highScores.length > 0 ? (
-                    // High scores table
+                    // High Scores Table
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="text-left text-cyan-300">
@@ -712,18 +806,19 @@ const CyberFishGame: React.FC = () => {
                             {highScores.map((entry, index) => {
                                 const isCurrentPlayer = entry.name === gameRef.current.currentPlayerName;
                                 const rowClass = `
-                                ${isCurrentPlayer ? 'current-player' : ''}
+                                ${isCurrentPlayer ? 'bg-indigo-900/30' : ''}
                                 high-score-row
+                                border-t border-indigo-800
                             `;
 
                                 // Medal icons for top 3 players
                                 const rankDisplay =
                                     index === 0 ? (
-                                        <span className="text-yellow-400 text-xl">🥇</span>
+                                        <span className="text-yellow-400">🥇</span>
                                     ) : index === 1 ? (
-                                        <span className="text-gray-300 text-xl">🥈</span>
+                                        <span className="text-gray-300">🥈</span>
                                     ) : index === 2 ? (
-                                        <span className="text-amber-700 text-xl">🥉</span>
+                                        <span className="text-amber-700">🥉</span>
                                     ) : (
                                         index + 1
                                     );
@@ -731,23 +826,50 @@ const CyberFishGame: React.FC = () => {
                                 return (
                                     <tr
                                         key={index}
-                                        ref={(el) => (rowRefs.current[index] = el)} // Assign ref to each row for scrolling
-                                        className={`${rowClass} text-indigo-200 border-t border-indigo-800`}
+                                        ref={(el) => (rowRefs.current[index] = el)}
+                                        className={`${rowClass} text-indigo-200`}
                                     >
-                                        <td className="py-1">{rankDisplay}</td>
-                                        <td className="py-1 truncate max-w-[50px] overflow-hidden text-ellipsis whitespace-nowrap" title={entry.name}>
+                                        <td className="py-1 px-1">{rankDisplay}</td>
+                                        <td className="py-1 px-1 truncate max-w-[50px] overflow-hidden text-ellipsis whitespace-nowrap"
+                                            title={entry.name}>
                                             {entry.name}
                                         </td>
-                                        <td className="py-1 text-right">{entry.score}</td>
-                                        <td className="py-1 text-right">{new Date(entry.date).toLocaleDateString()}</td>
+                                        <td className="py-1 px-1 text-right">{entry.score}</td>
+                                        <td className="py-1 px-1 text-right text-xs">
+                                            {new Date(entry.date).toLocaleDateString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric'
+                                            })}
+                                        </td>
                                     </tr>
                                 );
                             })}
                         </tbody>
                     </table>
                 ) : (
-                    // No scores state
-                    <p className="text-indigo-300">No scores yet. Be the first!</p>
+                    // No Scores State
+                    <div className="text-center py-4">
+                        <p className="text-indigo-300 mb-2">No scores yet. Be the first!</p>
+                        {gameRef.current.currentPlayerName && !gameStarted && (
+                            <button
+                                onClick={startGame}
+                                className="px-3 py-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded text-sm cursor-pointer"
+                            >
+                                Start Playing
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {/* Current Player Indicator */}
+                {gameRef.current.currentPlayerName && highScores.length > 0 && (
+                    <div className="text-xs text-cyan-400 mt-2 text-center">
+                        {highScores.some(e => e.name === gameRef.current.currentPlayerName) ? (
+                            <span>Your score is highlighted</span>
+                        ) : (
+                            <span>Play to add your score to the leaderboard</span>
+                        )}
+                    </div>
                 )}
             </div>
         );
@@ -756,9 +878,9 @@ const CyberFishGame: React.FC = () => {
     // Render the futuristic name input screen
     const renderFuturisticNameInput = () => {
         return (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-60">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 z-50">
                 {/* Animated Grid Background */}
-                <div className="absolute inset-0 overflow-hidden"
+                <div className="absolute inset-0 overflow-hidden opacity-70"
                     style={{
                         background: `
                         linear-gradient(160deg, rgba(0, 0, 75, 0.9), rgba(99, 2, 75, 0.95)),
@@ -766,12 +888,24 @@ const CyberFishGame: React.FC = () => {
                         radial-gradient(circle, rgba(4, 255, 255, 0.1) 10%, transparent 20%),
                         radial-gradient(circle, rgba(50, 255, 255, 0.05) 20%, transparent 30%)
                     `,
-                        backgroundSize: 'cover, 40px 40px, 200px 200px, 300px 300px'
+                        backgroundSize: 'cover, 40px 40px, 200px 200px, 300px 300px',
+                        animation: 'gridMove 10s linear infinite'
                     }}>
                 </div>
 
+                {/* Connection Status Indicator (Top Right) */}
+                <div className="absolute top-4 right-4 flex items-center">
+                    <div
+                        className={`w-2 h-2 rounded-full mr-2 ${isCheckingName ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}
+                        title={isCheckingName ? 'Verifying name...' : 'Server connected'}
+                    ></div>
+                    <span className="text-xs text-cyan-300">
+                        {isCheckingName ? 'Verifying...' : 'Online'}
+                    </span>
+                </div>
+
                 {/* Holographic Container */}
-                <div className="relative z-10 bg-gradient-to-r from-indigo-900/50 to-purple-900/50 backdrop-blur-md rounded-2xl p-8 max-w-md border border-cyan-500/30 shadow-2xl">
+                <div className="relative z-10 bg-gradient-to-br from-indigo-900/60 to-purple-900/60 backdrop-blur-lg rounded-2xl p-6 sm:p-8 max-w-md w-11/12 border border-cyan-500/40 shadow-2xl neon-glow">
                     {/* Scan lines effect */}
                     <div className="absolute inset-0 pointer-events-none"
                         style={{
@@ -780,59 +914,142 @@ const CyberFishGame: React.FC = () => {
                         }}>
                     </div>
 
+                    {/* Glowing border animation */}
+                    <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+                        <div className="absolute inset-0 border-2 border-transparent animate-border-pulse"></div>
+                    </div>
+
                     {/* Header with tech glow */}
-                    <div className="text-center mb-8 relative">
+                    <div className="text-center mb-6 relative">
                         <div className="absolute -inset-1 bg-cyan-500/20 blur-lg rounded-full"></div>
-                        <h3 className="text-cyan-400 text-3xl font-bold mb-2 relative">CYBER FISH NICKNAME</h3>
+                        <h3 className="text-cyan-300 text-2xl sm:text-3xl font-bold mb-2 relative tracking-wider">
+                            CYBER FISH IDENTIFICATION
+                        </h3>
                         <div className="h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent w-full my-3"></div>
-                        <p className="text-indigo-300 relative">Activate your aquatic avatar</p>
+                        <p className="text-indigo-300 relative text-sm sm:text-base">
+                            Register your aquatic avatar identity
+                        </p>
                     </div>
 
                     {/* Form for name input */}
                     <form onSubmit={handleNameSubmit} className="flex flex-col items-center relative z-20">
-                        <div className="relative w-full mb-6">
-                            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg blur opacity-30"></div>
+                        <div className="relative w-full mb-4">
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg blur opacity-30 animate-glow-pulse"></div>
                             <input
                                 type="text"
                                 placeholder="ENTER YOUR CYBER NAME"
                                 value={playerName}
-                                onChange={(e) => setPlayerName(e.target.value)}
-                                className="relative px-4 py-3 bg-black/70 text-cyan-300 rounded-lg border border-cyan-500/50 focus:outline-none focus:ring focus:ring-purple-500/50 w-full placeholder-cyan-600 font-mono tracking-wide"
+                                onChange={(e) => {
+                                    setPlayerName(e.target.value);
+                                    setNameInputError('');
+                                }}
+                                className="relative px-4 py-3 bg-black/80 text-cyan-200 rounded-lg border border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 w-full placeholder-cyan-600/70 font-mono tracking-wide text-sm sm:text-base"
+                                maxLength={20}
+                                disabled={isCheckingName}
                             />
+                            {playerName && (
+                                <div className="absolute right-3 top-3 text-xs text-cyan-500/70">
+                                    {20 - playerName.length}
+                                </div>
+                            )}
                         </div>
 
-                        {nameInputError && (
-                            <div className="text-red-400 mb-4 font-mono text-sm w-full bg-red-900/20 border border-red-800 rounded p-2">
-                                {nameInputError}
+                        {/* Error Message */}
+                        {(nameInputError || errorMessage) && (
+                            <div className={`w-full mb-4 p-2 rounded-lg text-sm font-mono ${nameInputError ? 'bg-red-900/30 border border-red-700/50 text-red-300' :
+                                'bg-yellow-900/30 border border-yellow-700/50 text-yellow-300'
+                                }`}>
+                                {nameInputError || errorMessage}
+                                <button
+                                    onClick={() => {
+                                        setNameInputError('');
+                                        setErrorMessage('');
+                                    }}
+                                    className="float-right text-xs px-2 py-0.5 bg-black/20 hover:bg-black/40 rounded"
+                                >
+                                    Dismiss
+                                </button>
                             </div>
                         )}
 
+                        {/* Submit Button */}
                         <button
                             type="submit"
-                            className="relative px-8 py-3 bg-gradient-to-r from-purple-600/80 to-indigo-600/80 hover:from-purple-500/80 hover:to-indigo-500/80 text-white rounded-lg focus:outline-none transform transition hover:scale-105 w-full overflow-hidden group cursor-pointer"
+                            disabled={!playerName.trim() || isCheckingName}
+                            className={`relative px-6 py-3 w-full rounded-lg focus:outline-none transform transition overflow-hidden group ${isCheckingName ? 'bg-indigo-800 cursor-wait' :
+                                'bg-gradient-to-r from-purple-600/80 to-indigo-600/80 hover:from-purple-500/80 hover:to-indigo-500/80 cursor-pointer hover:scale-[1.02]'
+                                }`}
                         >
-                            <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-20 transition-opacity"></span>
-                            <span className="absolute left-0 w-8 h-full bg-white/20 transform -skew-x-30 -translate-x-10 group-hover:translate-x-32 transition-transform ease-out duration-700"></span>
-                            <span className="relative font-bold tracking-wide">LAUNCH INTO THE GALACTIC OCEAN</span>
+                            {isCheckingName ? (
+                                <div className="flex items-center justify-center space-x-2">
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    <span className="text-white font-bold tracking-wider text-sm sm:text-base">
+                                        VERIFYING IDENTITY...
+                                    </span>
+                                </div>
+                            ) : (
+                                <>
+                                    <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
+                                    <span className="absolute left-0 w-8 h-full bg-white/20 transform -skew-x-30 -translate-x-10 group-hover:translate-x-32 transition-transform duration-700 ease-out"></span>
+                                    <span className="relative text-white font-bold tracking-wider text-sm sm:text-base">
+                                        ACTIVATE CYBER FISH
+                                    </span>
+                                </>
+                            )}
                         </button>
+
+                        {/* Character Limit Hint */}
+                        <div className="text-xs text-indigo-400 mt-3">
+                            Max 20 characters. No special symbols.
+                        </div>
                     </form>
                 </div>
+
+                {/* CSS for animations */}
+                <style>{`
+                @keyframes gridMove {
+                    0% { background-position: 0 0; }
+                    100% { background-position: 40px 40px; }
+                }
+                @keyframes border-pulse {
+                    0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); }
+                    50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.7); }
+                    100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); }
+                }
+                .animate-border-pulse {
+                    animation: border-pulse 2s infinite;
+                }
+                @keyframes glow-pulse {
+                    0% { opacity: 0.3; }
+                    50% { opacity: 0.5; }
+                    100% { opacity: 0.3; }
+                }
+                .animate-glow-pulse {
+                    animation: glow-pulse 3s infinite;
+                }
+                .neon-glow {
+                    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+                }
+            `}</style>
             </div>
         );
     };
 
     return (
         <div id="cyber-fish" className="w-full max-w-4xl mx-auto p-4">
-            <div className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg p-4 shadow-2xl border border-indigo-700">
+            {/* Main Game Container */}
+            <div className="bg-gradient-to-br from-blue-900/90 to-purple-900/90 rounded-xl p-4 shadow-2xl border border-indigo-700/50">
                 {/* Game Title */}
-                <h2 className="text-3xl text-center mb-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameName}</h2>
+                <h2 className="text-3xl text-center mb-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 tracking-wider">
+                    {gameName}
+                </h2>
 
                 {/* Canvas Container */}
                 <div className="relative w-full" style={{ paddingBottom: '60%', minHeight: '300px', height: '60vh' }}>
                     <canvas
                         ref={canvasRef}
                         onClick={handleInput}
-                        className="absolute inset-0 w-full h-full border rounded-lg border-indigo-500 bg-gradient-to-b from-black via-blue-950 to-purple-950"
+                        className="absolute inset-0 w-full h-full border rounded-xl border-indigo-500/50 bg-gradient-to-br from-black via-blue-950/80 to-purple-950/80"
                         style={{ minHeight: '300px', height: '60vh' }}
                     />
 
@@ -842,63 +1059,176 @@ const CyberFishGame: React.FC = () => {
                     {/* Start Game Screen */}
                     {!gameStarted && !showNameInput && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center" onClick={startGame}>
-                            <div className="bg-black/50 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/30">
-                                <p className="text-cyan-400 text-4xl mb-2 font-bold text-center">Ready to swim, {gameRef.current.currentPlayerName}?</p>
+                            <div className="bg-black/60 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/30 shadow-lg max-w-md w-11/12 text-center">
+                                <p className="text-cyan-300 text-2xl sm:text-3xl mb-3 font-bold">
+                                    Ready to swim, <span className="text-purple-300">{gameRef.current.currentPlayerName}</span>?
+                                </p>
                                 <div className="h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent w-full my-4"></div>
-                                <p className="text-indigo-300 text-xl text-center">Click or press <span className="font-bold">Space</span> to dive into the galactic ocean</p>
+                                <p className="text-indigo-300 text-lg mb-4">
+                                    Navigate through the neon gates
+                                </p>
+                                <div className="flex flex-col space-y-3 mt-6">
+                                    <button
+                                        onClick={startGame}
+                                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-full focus:ring-2 focus:ring-purple-500/50 transition transform hover:scale-105 cursor-pointer font-bold tracking-wide"
+                                    >
+                                        BEGIN MISSION
+                                    </button>
+                                    <button
+                                        onClick={() => setShowNameInput(true)}
+                                        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-indigo-300 rounded-full text-sm transition"
+                                    >
+                                        Change Player Name
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
 
                     {/* Game Over Screen */}
                     {gameOver && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
-                            <div className="bg-gradient-to-r from-indigo-900/70 to-purple-900/70 p-6 sm:p-8 rounded-xl border border-red-500/30 shadow-lg w-11/12 sm:max-w-md text-center">
-                                <p className="text-red-500 text-2xl sm:text-3xl mb-2 font-bold">FISH TERMINATED!</p>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
+                            <div className="bg-gradient-to-br from-indigo-900/80 to-purple-900/80 p-6 sm:p-8 rounded-xl border border-red-500/40 shadow-2xl w-11/12 sm:max-w-md text-center">
+                                <p className="text-red-400 text-2xl sm:text-3xl mb-3 font-bold tracking-wider">FISH TERMINATED!</p>
                                 <div className="h-px bg-gradient-to-r from-transparent via-red-500 to-transparent w-full my-4"></div>
-                                <p className="text-cyan-400 text-xl sm:text-2xl mb-2">Score: {score}</p>
-                                <p className="text-purple-400 text-lg sm:text-xl mb-6">High Score: {highScore}</p>
-                                <button
-                                    onClick={resetGame}
-                                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-full focus:ring focus:ring-purple-500/50 transition transform hover:scale-105 cursor-pointer"
-                                >
-                                    Swim Again
-                                </button>
+
+                                <div className="flex justify-center space-x-8 mb-6">
+                                    <div className="text-center">
+                                        <p className="text-cyan-300 text-sm">SCORE</p>
+                                        <p className="text-2xl font-bold">{score}</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-purple-300 text-sm">HIGH SCORE</p>
+                                        <p className="text-2xl font-bold">{highScore}</p>
+                                    </div>
+                                </div>
+
+                                {isSavingScore && (
+                                    <div className="mb-6 flex items-center justify-center space-x-2">
+                                        <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                                        <span className="text-cyan-300 text-sm">Securing your place in history...</span>
+                                    </div>
+                                )}
+
+                                {errorMessage && (
+                                    <div className="mb-4 p-2 bg-yellow-900/30 border border-yellow-700/50 rounded text-yellow-300 text-sm">
+                                        {errorMessage}
+                                        <button
+                                            onClick={() => setErrorMessage('')}
+                                            className="float-right text-xs px-2 py-0.5 bg-black/20 hover:bg-black/40 rounded"
+                                        >
+                                            Dismiss
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="flex flex-col space-y-3">
+                                    <button
+                                        onClick={resetGame}
+                                        disabled={isSavingScore}
+                                        className={`px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full focus:ring-2 focus:ring-purple-500/50 transition font-bold tracking-wide ${isSavingScore ? 'opacity-50 cursor-not-allowed' : 'hover:from-purple-500 hover:to-indigo-500 hover:scale-105'
+                                            }`}
+                                    >
+                                        {isSavingScore ? 'PROCESSING...' : 'SWIM AGAIN'}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowNameInput(true);
+                                            resetGame();
+                                        }}
+                                        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-indigo-300 rounded-full text-sm transition"
+                                    >
+                                        New Player
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
 
                     {/* Score Display */}
                     {!gameOver && !showNameInput && (
-                        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black bg-opacity-70 backdrop-blur-sm px-4 py-2 rounded-full text-cyan-400 border border-cyan-500/30">
-                            Score: {score}
+                        <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full text-cyan-300 border border-cyan-500/30 flex items-center">
+                            <span className="mr-2">SCORE:</span>
+                            <span className="font-bold">{score}</span>
+                        </div>
+                    )}
+
+                    {/* Connection Status (Game View) */}
+                    {!showNameInput && (
+                        <div className="absolute top-3 left-3 flex items-center">
+                            <div
+                                className={`w-2 h-2 rounded-full mr-2 ${isLoading || isCheckingName || isSavingScore ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'
+                                    }`}
+                            ></div>
+                            <span className="text-xs text-indigo-300">
+                                {isLoading || isCheckingName || isSavingScore ? 'Connecting...' : 'Online'}
+                            </span>
                         </div>
                     )}
                 </div>
 
                 {/* Game Instructions */}
-                <div className="mt-4 text-center text-sm text-indigo-300">
-                    Click or press <span className="font-bold">Space</span> to swim through the neon gates
+                <div className="mt-4 text-center text-sm text-indigo-300/80">
+                    <p>Click or press <span className="font-bold text-cyan-300">SPACE</span> to swim through the neon gates</p>
+                    {isSmallDevice && (
+                        <p className="text-xs mt-1">Tilt device for better control</p>
+                    )}
                 </div>
 
                 {/* Layout for High Scores and Navigation Guide */}
                 <div className="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-4">
+                    {/* Navigation Guide */}
                     <div className="lg:col-span-2">
-                        <div className="bg-gradient-to-b from-black to-purple-950 bg-opacity-70 backdrop-blur-sm rounded-lg p-4 h-full border border-indigo-800/50">
-                            <h3 className="text-cyan-400 text-lg font-semibold mb-2">Navigation Guide</h3>
-                            <ul className="text-indigo-300 list-disc pl-5 space-y-2">
-                                <li>Click or press <span className="font-bold">Space</span> or tap to swim forward</li>
-                                <li>Navigate through the neon gates</li>
-                                <li>Each gate passed earns you 1 point</li>
-                                <li>Avoid collisions with gates and boundaries</li>
+                        <div className="bg-gradient-to-br from-black/70 to-purple-950/70 backdrop-blur-sm rounded-xl p-4 h-full border border-indigo-800/50">
+                            <h3 className="text-cyan-400 text-lg font-semibold mb-3 flex items-center">
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                NAVIGATION GUIDE
+                            </h3>
+                            <ul className="text-indigo-300/90 space-y-2 text-sm">
+                                <li className="flex items-start">
+                                    <span className="bg-cyan-500/20 rounded-full p-1 mr-2">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </span>
+                                    <span>Click or <span className="font-bold text-cyan-300">SPACE</span> to swim forward</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="bg-cyan-500/20 rounded-full p-1 mr-2">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </span>
+                                    <span>Navigate through the neon gates</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="bg-cyan-500/20 rounded-full p-1 mr-2">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </span>
+                                    <span>Each gate passed earns you <span className="font-bold text-purple-300">1 point</span></span>
+                                </li>
+                                <li className="flex items-start">
+                                    <span className="bg-cyan-500/20 rounded-full p-1 mr-2">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </span>
+                                    <span>Avoid collisions with gates and boundaries</span>
+                                </li>
                             </ul>
                         </div>
                     </div>
-                    <div className="lg:col-span-2">
+
+                    {/* High Scores */}
+                    <div className="lg:col-span-2 space-y-4">
                         {renderHighScores()}
 
                         {/* Scroll to Current Player's Score Button */}
-                        <div className="flex justify-center mt-6">
+                        {highScores.some(entry => entry.name === gameRef.current.currentPlayerName) && (
                             <button
                                 onClick={() => {
                                     const currentPlayerIndex = highScores.findIndex(
@@ -911,35 +1241,57 @@ const CyberFishGame: React.FC = () => {
                                         });
                                     }
                                 }}
-                                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white rounded-full focus:ring focus:ring-blue-400/50 transition transform hover:scale-105 cursor-pointer text-lg font-semibold shadow-lg"
+                                className="w-full px-4 py-3 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 text-white rounded-xl focus:outline-none transition transform hover:scale-[1.02] cursor-pointer flex items-center justify-center cursor-pointer"
                             >
-                                Scroll to My Score
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                </svg>
+                                FIND MY SCORE
                             </button>
-                        </div>
+                        )}
+
+                        {/* Refresh Scores Button */}
+                        <button
+                            onClick={fetchHighScores}
+                            disabled={isLoading}
+                            className={`w-full px-4 py-3 bg-gray-800 hover:bg-gray-700/80 text-indigo-300 rounded-xl transition flex items-center justify-center cursor-pointer ${isLoading ? 'opacity-50 cursor-wait' : ''
+                                }`}
+                        >
+                            {isLoading ? (
+                                <>
+                                    <svg className="animate-spin w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    REFRESHING...
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    REFRESH LEADERBOARD
+                                </>
+                            )}
+                        </button>
                     </div>
                 </div>
             </div>
 
             {/* CSS Animations */}
             <style>{`
-            @keyframes gridMove {
-                0% { background-position: 0 0; }
-                100% { background-position: 40px 40px; }
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
             }
-
-            @media (max-width: 768px) {
-                .text-4xl {
-                    font-size: 2rem;
-                }
-                .text-xl {
-                    font-size: 1rem;
-                }
-                .text-lg {
-                    font-size: 1.125rem;
-                }
-                .text-sm {
-                    font-size: 0.875rem;
-                }
+            .animate-spin {
+                animation: spin 1s linear infinite;
+            }
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            .animate-pulse {
+                animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
             }
         `}</style>
         </div>
