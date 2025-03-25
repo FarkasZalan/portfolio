@@ -94,7 +94,7 @@ const CyberFishGame: React.FC = () => {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-            const response = await fetch('https://portfolio-4wgj.onrender.com/api/scores', {
+            const response = await fetch('https://portfolio-k8zk.onrender.com/api/scores', {
                 signal: controller.signal
             });
 
@@ -127,7 +127,7 @@ const CyberFishGame: React.FC = () => {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-            const response = await fetch('https://portfolio-4wgj.onrender.com/api/scores', {
+            const response = await fetch('https://portfolio-k8zk.onrender.com/api/scores', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -338,7 +338,7 @@ const CyberFishGame: React.FC = () => {
             const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
             const response = await fetch(
-                `https://portfolio-4wgj.onrender.com/api/scores/check-name?name=${encodeURIComponent(name)}`,
+                `https://portfolio-k8zk.onrender.com/api/scores/check-name?name=${encodeURIComponent(name)}`,
                 { signal: controller.signal }
             );
 
