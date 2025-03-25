@@ -894,7 +894,7 @@ const CyberFishGame: React.FC = () => {
                 </div>
 
                 {/* Connection Status Indicator (Top Right) */}
-                <div className="absolute top-4 right-4 flex items-center">
+                <div className="absolute top-5 right-4 flex items-center">
                     <div
                         className={`w-2 h-2 rounded-full mr-2 ${isCheckingName ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}
                         title={isCheckingName ? 'Verifying name...' : 'Server connected'}

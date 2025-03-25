@@ -42,7 +42,7 @@ export const SideNav = () => {
 
             {/* Mobile Navigation Menu */}
             <div
-                className={`fixed w-full h-screen bg-black/50 backdrop-blur-md flex flex-col justify-center items-center z-20 md:hidden transition-all duration-300 ease-in-out ${nav ? "opacity-100 visible" : "opacity-0 invisible"
+                className={`fixed w-full h-screen bg-black/50 backdrop-blur-md flex flex-col justify-center items-center z-60 md:hidden transition-all duration-300 ease-in-out ${nav ? "opacity-100 visible" : "opacity-0 invisible"
                     }`}
             >
                 <a
