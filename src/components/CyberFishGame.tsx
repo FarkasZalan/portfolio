@@ -1084,7 +1084,7 @@ const CyberFishGame: React.FC = () => {
                                         }}
                                         className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white rounded-full focus:ring focus:ring-blue-400/50 transition transform hover:scale-105 cursor-pointer text-lg font-semibold shadow-lg transition cursor-pointer font-bold tracking-wide hover:scale-105"
                                     >
-                                        Change Player Name
+                                        New Player
                                     </button>
                                 </div>
                             </div>
@@ -1105,7 +1105,9 @@ const CyberFishGame: React.FC = () => {
                                     </div>
                                     <div className="text-center">
                                         <p className="text-purple-300 text-sm">HIGH SCORE</p>
-                                        <p className="text-2xl font-bold text-purple-300">{highScore}</p>
+                                        <p className="text-2xl font-bold text-purple-300">
+                                            {highScores.find(s => s.name === gameRef.current.currentPlayerName)?.score || highScore}
+                                        </p>
                                     </div>
                                 </div>
 
@@ -1143,6 +1145,7 @@ const CyberFishGame: React.FC = () => {
                                             resetGame();
                                             setNameInputError('');
                                             setPlayerName('');
+                                            setHighScore(0);
                                         }}
                                         className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white rounded-full focus:ring focus:ring-blue-400/50 transition transform hover:scale-105 cursor-pointer text-lg font-semibold shadow-lg transition cursor-pointer font-bold tracking-wide hover:scale-105"
                                     >
