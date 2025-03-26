@@ -126,7 +126,7 @@ const CyberFishGame: React.FC = () => {
                 // Final failure after max retries
                 setIsLoading(false);
                 if (error.name === 'AbortError') {
-                    setErrorMessage('Server is not responding. Please check your connection and try again later.');
+                    setErrorMessage('Server is cold starting. Please try again later.');
                 } else {
                     setErrorMessage('Failed to load high scores after several attempts. Please try again later.');
                 }
