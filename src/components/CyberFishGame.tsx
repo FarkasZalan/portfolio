@@ -806,10 +806,12 @@ const CyberFishGame: React.FC = () => {
                             {highScores.map((entry, index) => {
                                 const isCurrentPlayer = entry.name === gameRef.current.currentPlayerName;
                                 const rowClass = `
-                                ${isCurrentPlayer ? 'bg-indigo-900/30' : ''}
-                                high-score-row
-                                border-t border-indigo-800
-                            `;
+                                ${isCurrentPlayer ? 'bg-cyan-700/30 border-l-4 border-l-cyan-400' : ''}
+                                    high-score-row
+                                    border-t border-indigo-800
+                                    hover:bg-cyan-700/20
+                                    transition-colors
+                                `;
 
                                 // Medal icons for top 3 players
                                 const rankDisplay =
@@ -965,7 +967,7 @@ const CyberFishGame: React.FC = () => {
                                         setNameInputError('');
                                         setErrorMessage('');
                                     }}
-                                    className="float-right text-xs px-2 py-0.5 bg-black/20 hover:bg-black/40 rounded"
+                                    className="float-right text-xs px-2 py-0.5 bg-black/20 hover:bg-black/40 rounded cursor-pointer"
                                 >
                                     Dismiss
                                 </button>
@@ -1070,13 +1072,17 @@ const CyberFishGame: React.FC = () => {
                                 <div className="flex flex-col space-y-3 mt-6">
                                     <button
                                         onClick={startGame}
-                                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-full focus:ring-2 focus:ring-purple-500/50 transition transform hover:scale-105 cursor-pointer font-bold tracking-wide"
+                                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-full focus:ring-2 focus:ring-purple-500/50 transition transform hover:scale-105 cursor-pointer font-bold tracking-wide cursor-pointer"
                                     >
                                         BEGIN MISSION
                                     </button>
                                     <button
-                                        onClick={() => setShowNameInput(true)}
-                                        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-indigo-300 rounded-full text-sm transition"
+                                        onClick={() => {
+                                            setShowNameInput(true);
+                                            setNameInputError('');
+                                            setPlayerName('');
+                                        }}
+                                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white rounded-full focus:ring focus:ring-blue-400/50 transition transform hover:scale-105 cursor-pointer text-lg font-semibold shadow-lg transition cursor-pointer font-bold tracking-wide hover:scale-105"
                                     >
                                         Change Player Name
                                     </button>
@@ -1095,11 +1101,11 @@ const CyberFishGame: React.FC = () => {
                                 <div className="flex justify-center space-x-8 mb-6">
                                     <div className="text-center">
                                         <p className="text-cyan-300 text-sm">SCORE</p>
-                                        <p className="text-2xl font-bold">{score}</p>
+                                        <p className="text-2xl font-bold text-cyan-300">{score}</p>
                                     </div>
                                     <div className="text-center">
                                         <p className="text-purple-300 text-sm">HIGH SCORE</p>
-                                        <p className="text-2xl font-bold">{highScore}</p>
+                                        <p className="text-2xl font-bold text-purple-300">{highScore}</p>
                                     </div>
                                 </div>
 
@@ -1115,7 +1121,7 @@ const CyberFishGame: React.FC = () => {
                                         {errorMessage}
                                         <button
                                             onClick={() => setErrorMessage('')}
-                                            className="float-right text-xs px-2 py-0.5 bg-black/20 hover:bg-black/40 rounded"
+                                            className="float-right text-xs px-2 py-0.5 bg-black/20 hover:bg-black/40 rounded cursor-pointer center text-center cursor-pointer"
                                         >
                                             Dismiss
                                         </button>
@@ -1126,7 +1132,7 @@ const CyberFishGame: React.FC = () => {
                                     <button
                                         onClick={resetGame}
                                         disabled={isSavingScore}
-                                        className={`px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full focus:ring-2 focus:ring-purple-500/50 transition font-bold tracking-wide ${isSavingScore ? 'opacity-50 cursor-not-allowed' : 'hover:from-purple-500 hover:to-indigo-500 hover:scale-105'
+                                        className={`px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full focus:ring-2 focus:ring-purple-500/50 transition cursor-pointer font-bold tracking-wide ${isSavingScore ? 'opacity-50 cursor-not-allowed' : 'hover:from-purple-500 hover:to-indigo-500 hover:scale-105'
                                             }`}
                                     >
                                         {isSavingScore ? 'PROCESSING...' : 'SWIM AGAIN'}
@@ -1135,10 +1141,12 @@ const CyberFishGame: React.FC = () => {
                                         onClick={() => {
                                             setShowNameInput(true);
                                             resetGame();
+                                            setNameInputError('');
+                                            setPlayerName('');
                                         }}
-                                        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-indigo-300 rounded-full text-sm transition"
+                                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white rounded-full focus:ring focus:ring-blue-400/50 transition transform hover:scale-105 cursor-pointer text-lg font-semibold shadow-lg transition cursor-pointer font-bold tracking-wide hover:scale-105"
                                     >
-                                        New Player
+                                        <span className="relative z-10">New Player</span>
                                     </button>
                                 </div>
                             </div>
@@ -1241,7 +1249,7 @@ const CyberFishGame: React.FC = () => {
                                         });
                                     }
                                 }}
-                                className="w-full px-4 py-3 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 text-white rounded-xl focus:outline-none transition transform hover:scale-[1.02] cursor-pointer flex items-center justify-center cursor-pointer"
+                                className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white rounded-xl focus:outline-none transition transform hover:scale-[1.02] cursor-pointer flex items-center justify-center cursor-pointer"
                             >
                                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
@@ -1254,7 +1262,7 @@ const CyberFishGame: React.FC = () => {
                         <button
                             onClick={fetchHighScores}
                             disabled={isLoading}
-                            className={`w-full px-4 py-3 bg-gray-800 hover:bg-gray-700/80 text-indigo-300 rounded-xl transition flex items-center justify-center cursor-pointer ${isLoading ? 'opacity-50 cursor-wait' : ''
+                            className={`w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl focus:ring-2 focus:ring-purple-500/50 transition cursor-pointer font-bold tracking-wide flex items-center justify-center cursor-pointer focus:outline-none transition transform hover:scale-[1.02] ${isLoading ? 'opacity-50 cursor-wait' : ''
                                 }`}
                         >
                             {isLoading ? (
