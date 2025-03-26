@@ -40,6 +40,9 @@ const CyberFishGame: React.FC = () => {
     const [isInitialized, setIsInitialized] = useState(false);
     const [isCheckingName, setIsCheckingName] = useState(false);
     const [isSavingScore, setIsSavingScore] = useState(false);
+    const MAX_RETRIES = 5;
+    const INITIAL_RETRY_DELAY = 1000; // 1 second
+    const BACKOFF_FACTOR = 2;
 
 
     // Check if it's a small device
@@ -85,14 +88,12 @@ const CyberFishGame: React.FC = () => {
     }, []);
 
     // Fetch high scores from the API
-    const fetchHighScores = async () => {
+    const fetchHighScores = async (retryCount: number = 0, retryDelay: number = INITIAL_RETRY_DELAY) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         try {
             setIsLoading(true);
             setErrorMessage('');
-
-            // Add timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
             const response = await fetch('https://portfolio-k8zk.onrender.com/api/scores', {
                 signal: controller.signal
@@ -108,24 +109,38 @@ const CyberFishGame: React.FC = () => {
             setHighScores(data);
             setIsLoading(false);
         } catch (error: any) {
-            setIsLoading(false);
-            if (error.name === 'AbortError') {
-                setErrorMessage('Server is waking up. Scores will load shortly.');
+            clearTimeout(timeoutId);
+
+            if (retryCount < MAX_RETRIES) {
+                // Calculate next retry delay with exponential backoff
+                const nextDelay = retryDelay * BACKOFF_FACTOR;
+
+                // Show user that we're retrying
+                setErrorMessage(`Connection issue. Retrying in ${Math.ceil(retryDelay / 1000)} seconds...`);
+
+                // Schedule retry
+                setTimeout(() => {
+                    fetchHighScores(retryCount + 1, nextDelay);
+                }, retryDelay);
             } else {
-                setErrorMessage('Failed to load high scores');
+                // Final failure after max retries
+                setIsLoading(false);
+                if (error.name === 'AbortError') {
+                    setErrorMessage('Server is not responding. Please check your connection and try again later.');
+                } else {
+                    setErrorMessage('Failed to load high scores after several attempts. Please try again later.');
+                }
             }
         }
     };
 
     // Save score to the API
-    const saveScore = async (name: string, scoreValue: number) => {
+    const saveScore = async (name: string, scoreValue: number, retryCount: number = 0, retryDelay: number = INITIAL_RETRY_DELAY) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         try {
             setIsSavingScore(true);
             setErrorMessage('');
-
-            // Add timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
             const response = await fetch('https://portfolio-k8zk.onrender.com/api/scores', {
                 method: 'POST',
@@ -145,11 +160,23 @@ const CyberFishGame: React.FC = () => {
             fetchHighScores(); // Refresh high scores after saving
             setIsSavingScore(false);
         } catch (error: any) {
-            setIsSavingScore(false);
-            if (error.name === 'AbortError') {
-                setErrorMessage('Server is waking up. Your score will be saved shortly.');
+            clearTimeout(timeoutId);
+
+            if (retryCount < MAX_RETRIES) {
+                const nextDelay = retryDelay * BACKOFF_FACTOR;
+
+                setTimeout(() => {
+                    saveScore(name, scoreValue, retryCount + 1, nextDelay);
+                }, retryDelay);
+
+                setErrorMessage(`Connection issue (${retryCount + 1}/${MAX_RETRIES}). Retrying in ${retryDelay / 1000} seconds...`);
             } else {
-                setErrorMessage('Failed to save score. Please try again.');
+                setIsSavingScore(false);
+                if (error.name === 'AbortError') {
+                    setErrorMessage('Server is waking up. Your score will be saved when connection is restored.');
+                } else {
+                    setErrorMessage('Failed to save score after multiple attempts. Please try again later.');
+                }
             }
         }
     };
@@ -328,14 +355,12 @@ const CyberFishGame: React.FC = () => {
     };
 
     // Check if a player name already exists in the high scores
-    const checkNameExists = async (name: string): Promise<boolean> => {
+    const checkNameExists = async (name: string, retryCount: number = 0, retryDelay: number = INITIAL_RETRY_DELAY): Promise<boolean> => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         try {
             setIsCheckingName(true);
             setNameInputError('');
-
-            // Add a timeout for the fetch request
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
             const response = await fetch(
                 `https://portfolio-k8zk.onrender.com/api/scores/check-name?name=${encodeURIComponent(name)}`,
@@ -352,13 +377,26 @@ const CyberFishGame: React.FC = () => {
             setIsCheckingName(false);
             return data.exists;
         } catch (error: any) {
-            setIsCheckingName(false);
-            if (error.name === 'AbortError') {
-                setNameInputError('Server is waking up. Please try again in a moment.');
+            clearTimeout(timeoutId);
+
+            if (retryCount < MAX_RETRIES) {
+                const nextDelay = retryDelay * BACKOFF_FACTOR;
+
+                setTimeout(() => {
+                    checkNameExists(name, retryCount + 1, nextDelay);
+                }, retryDelay);
+
+                setNameInputError(`Connection issue (${retryCount + 1}/${MAX_RETRIES}). Retrying in ${retryDelay / 1000} seconds...`);
+                return false;
             } else {
-                setNameInputError('Failed to check name. Please try again.');
+                setIsCheckingName(false);
+                if (error.name === 'AbortError') {
+                    setNameInputError('Server is waking up. Please try again later.');
+                } else {
+                    setNameInputError('Failed to check name after multiple attempts');
+                }
+                return false;
             }
-            return false;
         }
     };
 
@@ -765,7 +803,7 @@ const CyberFishGame: React.FC = () => {
                         </p>
                         {errorMessage && (
                             <button
-                                onClick={fetchHighScores}
+                                onClick={() => fetchHighScores()}
                                 className="mt-2 px-3 py-1 bg-indigo-700 hover:bg-indigo-600 rounded text-xs cursor-pointer"
                             >
                                 Retry Connection
@@ -778,7 +816,7 @@ const CyberFishGame: React.FC = () => {
                         <p className="text-red-400 mb-2">{errorMessage}</p>
                         <div className="flex justify-center space-x-2">
                             <button
-                                onClick={fetchHighScores}
+                                onClick={() => fetchHighScores()}
                                 className="px-3 py-1 bg-indigo-700 hover:bg-indigo-600 rounded text-sm cursor-pointer"
                             >
                                 Retry
@@ -1263,7 +1301,7 @@ const CyberFishGame: React.FC = () => {
 
                         {/* Refresh Scores Button */}
                         <button
-                            onClick={fetchHighScores}
+                            onClick={() => fetchHighScores()}
                             disabled={isLoading}
                             className={`w-full px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl focus:ring-2 focus:ring-purple-500/50 transition cursor-pointer font-bold tracking-wide flex items-center justify-center cursor-pointer focus:outline-none transition transform hover:scale-[1.02] ${isLoading ? 'opacity-50 cursor-wait' : ''
                                 }`}
