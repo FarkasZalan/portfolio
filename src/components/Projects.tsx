@@ -4,6 +4,8 @@ import PizzeriaImage from '../assets/images/pizzeria.png';
 import AccomodationsImahe from '../assets/images/accomodation.png';
 import VegAndFruImage from '../assets/images/vegAndFru.png';
 import GymBroImage from '../assets/images/gymBro.png';
+import NovoImage from '../assets/images/novo.png';
+import CyberFishImage from '../assets/images/cyber-fish.png';
 
 const Projects = () => {
     const [activeProject, setActiveProject] = useState<string | null>(null);
@@ -12,9 +14,21 @@ const Projects = () => {
     // List of projects
     const projectList = [
         {
+            img: NovoImage,
+            title: "Novo",
+            technologies: "Node.js, PostgreSQL, Redis, Docker, Jest (Unit Testing), JWT, OAUth, Webhooks (Stripe), Swagger, React, Tailwind",
+            link: "https://github.com/FarkasZalan/Novo",
+        },
+        {
+            img: CyberFishImage,
+            title: "Cyber Fish",
+            technologies: "React, TypeScript, Tailwind, Node.js, MongoDB",
+            link: "https://github.com/FarkasZalan/portfolio",
+        },
+        {
             img: GymBroImage,
             title: "GymBro",
-            technologies: "Angular, Firebase, Stripe, Node.js",
+            technologies: "Angular, Firebase, Stripe",
             link: "https://github.com/FarkasZalan/GymBro",
         },
         {
