@@ -15,37 +15,37 @@ const Projects = () => {
     const projectList = [
         {
             img: NovoImage,
-            title: "Novo",
+            title: "Novo - Task & Issue Tracker",
             technologies: "Node.js, PostgreSQL, Redis, Docker, Jest (Unit Testing), JWT, OAUth, Webhooks (Stripe), Swagger, React, Tailwind",
             link: "https://github.com/FarkasZalan/Novo",
         },
         {
             img: CyberFishImage,
-            title: "Cyber Fish",
+            title: "Portfolio & Cyber Fish - Flappy Bird Clone",
             technologies: "React, TypeScript, Tailwind, Node.js, MongoDB",
             link: "https://github.com/FarkasZalan/portfolio",
         },
         {
             img: GymBroImage,
-            title: "GymBro",
+            title: "GymBro - Webshop & Blog",
             technologies: "Angular, Firebase, Stripe",
             link: "https://github.com/FarkasZalan/GymBro",
         },
         {
             img: VegAndFruImage,
-            title: "VegAndFru",
+            title: "VegAndFru - Grocery Shopping App",
             technologies: "Java, Android Studio, Firebase",
             link: "https://github.com/FarkasZalan/VegAndFru",
         },
         {
             img: AccomodationsImahe,
-            title: "Accommodations",
+            title: "Airbnb-Style Web App",
             technologies: "Java, Spring Boot, MySQL, Docker",
             link: "https://github.com/FarkasZalan/Szallasok",
         },
         {
             img: PizzeriaImage,
-            title: "Pizzeria",
+            title: "Restaurant Food Ordering Web App",
             technologies: "Java, Spring Boot, MySQL, Docker",
             link: "https://github.com/FarkasZalan/Pizzazo",
         },
