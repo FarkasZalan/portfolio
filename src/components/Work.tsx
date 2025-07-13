@@ -3,6 +3,14 @@ import WorkItem from "./WorkItem";
 // Work experience data
 const data = [
     {
+        year: 2025,
+        title: "Backend Developer",
+        company: "IBM",
+        duration: "Current",
+        details:
+            "",
+    },
+    {
         year: 2024,
         title: "Software Development Intern",
         company: "Modularity Kft.",
